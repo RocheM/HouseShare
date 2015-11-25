@@ -1,12 +1,15 @@
 package itt.matthew.houseshare;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,6 +21,10 @@ import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.HttpMethod;
 import com.facebook.Profile;
+import com.microsoft.windowsazure.mobileservices.MobileServiceClient;
+import com.microsoft.windowsazure.mobileservices.http.ServiceFilterResponse;
+import com.microsoft.windowsazure.mobileservices.table.MobileServiceTable;
+import com.microsoft.windowsazure.mobileservices.table.TableQueryCallback;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -27,12 +34,17 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.util.List;
+
+import bolts.Bolts;
 
 public class MainActivity extends AppCompatActivity {
 
-    JSONObject JSONresponse;
-    TextView details;
-    AccessToken CurrentToken = AccessToken.getCurrentAccessToken();
+    private TextView details;
+    private MobileServiceClient mClient;
+    private MobileServiceTable<Account> mAccountTable;
+    private Account current;
+    private Button button;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,76 +58,74 @@ public class MainActivity extends AppCompatActivity {
         details = (TextView) findViewById(R.id.details);
         details.setText("Welcome " + Profile.getCurrentProfile().getName());
 
-        GraphRequest request = GraphRequest.newMeRequest(
-                CurrentToken,
-                new GraphRequest.GraphJSONObjectCallback() {
-                    @Override
-                    public void onCompleted(
-                            JSONObject object,
-                            GraphResponse response) {
-                        JSONresponse = object;
-
-                        try {
-
-
-                            String detailsToAdd = JSONresponse.getString("birthday");
-                            details.append("\n" + detailsToAdd);
-
-                            detailsToAdd = JSONresponse.getString("bio");
-                            details.append("\n" +detailsToAdd);
-
-                            Log.d("Facebook", CurrentToken.toString());
-
-                        }catch(JSONException ex){
-                            ex.printStackTrace();
-                        }
-                        catch (NullPointerException ex){
-                            ex.printStackTrace();
-                        }
-                    }
-
-                });
-
-        Bundle parameters = new Bundle();
-        parameters.putString("fields", "id,name,bio,birthday");
-        request.setParameters(parameters);
-        request.executeAsync();
+        button = (Button) findViewById(R.id.button);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO Auto-generated method stub
+                Intent i = new Intent(getApplicationContext(),GroupCreate.class);
+                startActivity(i);
+            }
+        });
 
 
 
-//        new PopulateProfile().execute();
+        try {
+            mClient = new MobileServiceClient(
+                    "https://houseshareproject.azure-mobile.net/",
+                    "iuqOtKPRNqrMfasRrLARUYNrihSzwh94",
+                    this
+            );
+
+        } catch (Exception e) {
 
 
+        }
 
+        mAccountTable = mClient.getTable(Account.class);
+        lookupAccount(Profile.getCurrentProfile().getId());
 
 
     }
-//
-//    private class PopulateProfile extends AsyncTask<Void, Void, TextView> {
-//
-//        @Override
-//        protected Void doInBackground(Void... params) {
-//            new GraphRequest(
-//                    AccessToken.getCurrentAccessToken(),
-//                    "/me",
-//                    null,
-//                    HttpMethod.GET,
-//                    new GraphRequest.Callback() {
-//                        public void onCompleted(GraphResponse response) {
-//                            JSONresponse = response.getJSONObject();
-//
-//                        }
-//                    }
-//            ).executeAsync();
 
-//
-//            return null;
-//        }
-//        protected void onPostExecute(TextView toSet) {
-//            toSet.setText(JSONresponse.toString());
-//        }
-//    }
 
+    public void lookupAccount(final String facebookID) {
+
+
+        new AsyncTask<Void, Void, Void>() {
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                        mAccountTable.where()
+                                .field("facebookID")
+                                .eq(facebookID)
+                                .execute(new TableQueryCallback<Account>() {
+                                             @Override
+                                             public void onCompleted(List<Account> result, int count, Exception exception, ServiceFilterResponse response) {
+                                                 if (exception == null) {
+                                                     current = result.get(0);
+                                                     details.append("\n" + current.getAbout());
+                                                     details.append("\n" + current.getLocation());
+                                                     details.append("\n" + current.getBirthday());
+
+                                                 } else
+                                                     exception.printStackTrace();
+                                             }
+                                         }
+                                );
+                } catch (Exception exception) {
+                    exception.printStackTrace();
+                }
+
+
+                return null;
+            }
+
+        }.execute();
+
+
+    }
 
     private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
         ImageView bmImage;
