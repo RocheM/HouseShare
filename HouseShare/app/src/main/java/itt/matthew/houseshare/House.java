@@ -1,5 +1,6 @@
 package itt.matthew.houseshare;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -7,7 +8,7 @@ import java.util.List;
  */
 public class House {
 
-    private List<String> members;
+//    private List<String> members;
     private String ID;
     private String name;
     private String description;
@@ -16,17 +17,18 @@ public class House {
 
         this.name = name;
         this.description = description;
+//        members = new ArrayList<String>();
     }
 
 
-
-    public List<String> getMembers() {
-        return members;
-    }
-
-    public void setMembers(List<String> members) {
-        this.members = members;
-    }
+//
+//    public List<String> getMembers() {
+//        return members;
+//    }
+//
+//    public void setMembers(List<String> members) {
+//        this.members = members;
+//    }
 
 
     public String getName() {
