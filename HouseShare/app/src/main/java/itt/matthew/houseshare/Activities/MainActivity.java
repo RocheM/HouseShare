@@ -1,6 +1,5 @@
-package itt.matthew.houseshare;
+package itt.matthew.houseshare.Activities;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -12,35 +11,23 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.facebook.AccessToken;
-import com.facebook.AccessTokenTracker;
-import com.facebook.FacebookRequestError;
-import com.facebook.GraphRequest;
-import com.facebook.GraphResponse;
-import com.facebook.HttpMethod;
 import com.facebook.Profile;
 import com.microsoft.windowsazure.mobileservices.MobileServiceClient;
 import com.microsoft.windowsazure.mobileservices.http.ServiceFilterResponse;
 import com.microsoft.windowsazure.mobileservices.table.MobileServiceTable;
 import com.microsoft.windowsazure.mobileservices.table.TableQueryCallback;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.w3c.dom.Text;
-
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.util.List;
 
-import bolts.Bolts;
+import itt.matthew.houseshare.Activities.GroupCreate;
+import itt.matthew.houseshare.Models.Account;
+import itt.matthew.houseshare.R;
 
 public class MainActivity extends AppCompatActivity {
 
-    private TextView details;
+    private TextView welcomeMessage;
     private MobileServiceClient mClient;
     private MobileServiceTable<Account> mAccountTable;
     private Account current;
@@ -51,12 +38,15 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Profile profile = Profile.getCurrentProfile();
 
-        new DownloadImageTask((ImageView) findViewById(R.id.imageView2))
-                .execute(Profile.getCurrentProfile().getProfilePictureUri(500, 500).toString());
+        if(profile != null) {
+           new DownloadImageTask((ImageView) findViewById(R.id.imageView2))
+                   .execute(profile.getProfilePictureUri(500, 500).toString());
 
-        details = (TextView) findViewById(R.id.details);
-        details.setText("Welcome " + Profile.getCurrentProfile().getName());
+            welcomeMessage = (TextView) findViewById(R.id.details);
+            welcomeMessage.setText("Welcome " + Profile.getCurrentProfile().getName());
+        }
 
         button = (Button) findViewById(R.id.button);
         button.setOnClickListener(new View.OnClickListener() {
@@ -105,9 +95,7 @@ public class MainActivity extends AppCompatActivity {
                                              public void onCompleted(List<Account> result, int count, Exception exception, ServiceFilterResponse response) {
                                                  if (exception == null) {
                                                      current = result.get(0);
-                                                     details.append("\n" + current.getAbout());
-                                                     details.append("\n" + current.getLocation());
-                                                     details.append("\n" + current.getBirthday());
+                                                     welcomeMessage.append("\nGroup ID: " + current.getHouseID());
 
                                                  } else
                                                      exception.printStackTrace();
@@ -150,6 +138,11 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(Bitmap result) {
             bmImage.setImageBitmap(result);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        moveTaskToBack(true);
     }
 
 }

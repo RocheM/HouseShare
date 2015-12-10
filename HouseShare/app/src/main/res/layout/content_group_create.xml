@@ -9,7 +9,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="itt.matthew.houseshare.GroupCreate"
+    tools:context=".Activities.GroupCreate"
     tools:showIn="@layout/activity_group_create">
 
     <TextView
@@ -53,6 +53,7 @@
         android:id="@+id/button2"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true" />
+
 
 
 </RelativeLayout>

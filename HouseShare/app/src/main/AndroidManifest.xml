@@ -15,14 +15,14 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".FBLogin">
+        <activity android:name=".Activities.FBLogin">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity" />
+        <activity android:name=".Activities.MainActivity" />
         <activity
             android:name="com.facebook.FacebookActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
@@ -39,9 +39,11 @@
             android:value="@string/facebook_app_id" />
 
         <activity
-            android:name=".GroupCreate"
+            android:name=".Activities.GroupCreate"
             android:label="@string/title_activity_group_create"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".Activities.JoinHouse" />
+        <activity android:name=".Activities.joinExisting"></activity>
     </application>
 
 </manifest>
