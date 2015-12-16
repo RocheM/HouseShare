@@ -132,12 +132,9 @@ public class FBLoginFragment extends Fragment {
         setupProfileTracker();
         setupAzure();
 
+
         mTokenTracker.startTracking();
         mProfileTracker.startTracking();
-
-        if (isLoggedIn() == true) {
-            startJoinHouseActivity();
-        }
 
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
@@ -180,7 +177,6 @@ public class FBLoginFragment extends Fragment {
             protected void onCurrentProfileChanged(Profile oldProfile, Profile currentProfile) {
                 Log.d("HouseShare", "" + currentProfile);
                 details.setText(constructWelcomeMessage(currentProfile));
-                checkIfExists();
             }
         };
     }
@@ -206,6 +202,9 @@ public class FBLoginFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        if(Profile.getCurrentProfile() != null){
+            checkIfExists();
+        }
 
         return inflater.inflate(R.layout.fragment_fblogin, container, false);
     }
