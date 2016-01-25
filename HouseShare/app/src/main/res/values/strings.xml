@@ -25,4 +25,20 @@
     </string>
     <string name="open_drawer">"Open"</string>
     <string name="close_drawer">"close"</string>
+
+    <string name="title_activity_account">accountActivity</string>
+
+    <string name="lorem">""Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam eu ornare elit. Vestibulum elementum metus non ligula elementum varius. Quisque et tellus at tellus mollis suscipit sit amet id est. In vel condimentum erat. Aliquam erat volutpat. In auctor, magna et volutpat aliquet, magna justo finibus tortor, ac efficitur tortor lacus vel mauris. Donec id sem gravida, molestie orci sit amet, elementum velit. Nulla cursus massa ac purus cursus, ac congue sapien commodo. Morbi tristique metus vel arcu ullamcorper, non vestibulum odio ullamcorper. Nunc quis eros vel dui gravida hendrerit. Nunc a elementum lectus.
+
+Donec ac nisl at arcu mollis posuere. Mauris a ligula porta, aliquam sapien eget, scelerisque dolor. Nullam suscipit dapibus mauris, facilisis dapibus erat tincidunt eu. Morbi non tellus nibh. Fusce a pellentesque arcu. Etiam porta at sapien eu semper. Phasellus sed facilisis ipsum. Pellentesque vulputate purus quis molestie luctus.
+
+Mauris et mauris ut eros dapibus porta. Maecenas volutpat mauris quam. Vivamus metus nisl, fringilla id nibh id, cursus elementum eros. In suscipit sed risus vitae gravida. Sed sed odio nec mi consequat pretium. Ut ac dictum nibh. Integer aliquet mattis fermentum. Cras varius risus eget mattis semper. Nullam non nibh hendrerit, fermentum lacus non, pulvinar ante. Pellentesque vel posuere ligula, vitae tempus velit. Nunc viverra eu arcu sed cursus. Pellentesque vel est at dolor pellentesque maximus. Vivamus eu elit eu enim cursus fringilla in vel nisl. Suspendisse dignissim tempor magna vitae euismod.
+
+Aenean sit amet maximus mi. Cras quis libero mauris. Aenean a tincidunt velit. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Suspendisse tincidunt, lorem et sollicitudin condimentum, justo odio aliquam quam, non pharetra massa elit eget leo. Mauris leo nisl, euismod sit amet auctor nec, elementum ut mi. Praesent aliquet nisl eu pellentesque consectetur. Maecenas lorem justo, condimentum quis placerat ut, sollicitudin eget ante. Aliquam dictum pulvinar sapien id tristique. Proin ipsum nisl, pretium eget felis non, molestie ullamcorper purus. Aliquam pharetra lacinia ex, eget euismod lorem aliquet et. Praesent nec molestie elit. Curabitur eget condimentum nisl. Phasellus eu diam finibus, pretium elit in, egestas tellus.
+
+Mauris nulla mauris, sollicitudin eu cursus ut, mollis id ex. Fusce consequat eget mauris at interdum. In vestibulum magna quis lorem dapibus pellentesque. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque tempor quam et tortor faucibus, a mattis arcu tincidunt. Nulla sem nunc, ultricies quis condimentum aliquam, pharetra quis massa. Praesent in aliquet purus. Maecenas ut vestibulum erat, eu accumsan libero. Phasellus ut tellus auctor, aliquet justo vitae, molestie nunc. In et urna vitae justo mollis bibendum. Proin volutpat tincidunt felis, nec aliquam leo mollis et. Aliquam luctus dictum augue, in pretium mauris mollis sit amet. Maecenas quam arcu, gravida non eros non, ullamcorper volutpat nisi.
+
+</string>
+    <string name="title_activity_create_cost">CreateCost</string>
+    <string name="action_settings">Settings</string>
 </resources>

@@ -50,8 +50,7 @@ public class GroupCreate extends AppCompatActivity {
 
         try {
             mClient = new MobileServiceClient(
-                    "https://houseshareproject.azure-mobile.net/",
-                    "iuqOtKPRNqrMfasRrLARUYNrihSzwh94",
+                    "https://backendhs.azurewebsites.net",
                     this
             );
 

@@ -4,11 +4,6 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
 
-    <!-- To auto-complete the email text field in the login form with the user's emails -->
-    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
-    <uses-permission android:name="android.permission.READ_PROFILE" />
-    <uses-permission android:name="android.permission.READ_CONTACTS" />
-
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -43,7 +38,14 @@
             android:label="@string/title_activity_group_create"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".Activities.JoinHouse" />
-        <activity android:name=".Activities.joinExisting"></activity>
+        <activity android:name=".Activities.joinExisting" />
+        <activity
+            android:name=".Activities.AccountActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".CreateCost"
+            android:label="@string/title_activity_create_cost"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

@@ -1,31 +1,18 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".Fragments.DetailsFragment"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".Activities.DetailsFragment">
+    android:layout_height="match_parent">
 
+    <GridView
+        android:id="@+id/gridview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:verticalSpacing="0dp"
+        android:horizontalSpacing="0dp"
+        android:stretchMode="columnWidth"
+        android:numColumns="2"/>
 
-
-
-
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/imageView2"
-        android:layout_marginTop="48dp"
-        android:layout_centerInParent="true"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true">
-    </ImageView>
-
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:id="@+id/details"
-        android:layout_above="@+id/imageView2"
-        android:layout_centerHorizontal="true"
-        android:textAlignment="center"/>
-
-</RelativeLayout>
+</FrameLayout>

@@ -1,5 +1,7 @@
 package itt.matthew.houseshare.Models;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -18,7 +20,7 @@ import java.util.List;
 /**
  * Created by Matthew on 11/25/2015.
  */
-public class House {
+public class House implements Parcelable {
 
     private String ID;
     private int HouseID;
@@ -32,6 +34,10 @@ public class House {
         this.description = description;
     }
 
+
+    public House(Parcel in){
+        readFromParcel(in);
+    }
 
 
 
@@ -87,6 +93,43 @@ public class House {
         Type listOfTestObject = new TypeToken<ArrayList<Account>>(){}.getType();
         members = gson.toJson(toUpload, listOfTestObject);
 
-
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel out, int flags) {
+
+        out.writeString(ID);
+        out.writeInt(HouseID);
+        out.writeString(members);
+        out.writeString(name);
+        out.writeString(description);
+    }
+
+
+    private void readFromParcel(Parcel in) {
+
+        ID = in.readString();
+        HouseID = in.readInt();
+        members = in.readString();
+        name = in.readString();
+        description = in.readString();
+    }
+
+    public static final Parcelable.Creator<House> CREATOR = new Parcelable.Creator<House>() {
+
+        public House createFromParcel(Parcel in) {
+            return new House(in);
+        }
+
+        public House[] newArray(int size) {
+            return new House[size];
+        }
+
+    };
+
 }

@@ -1,13 +1,15 @@
 package itt.matthew.houseshare.Models;
 
 import android.graphics.Bitmap;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.facebook.Profile;
 
 /**
  * Created by Matthew on 11/23/2015.
  */
-public class Account {
+public class Account implements Parcelable {
 
     private String Id;
     private String facebookID;
@@ -32,6 +34,10 @@ public class Account {
 
         this.facebookID = facebookID;
         this.name = name;
+    }
+
+    public Account(Parcel in){
+        readFromParcel(in);
     }
 
 
@@ -74,5 +80,45 @@ public class Account {
     public int getHouseID(){return houseID;}
 
     public void setHouseID(int houseID) {this.houseID = houseID; }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel out, int flags) {
+
+        out.writeString(Id);
+        out.writeString(facebookID);
+        out.writeString(name);
+        out.writeString(birthday);
+        out.writeString(location);
+        out.writeString(about);
+        out.writeInt(houseID);
+    }
+    private void readFromParcel(Parcel in) {
+
+        Id = in.readString();
+        facebookID = in.readString();
+        name = in.readString();
+        birthday = in.readString();
+        location = in.readString();
+        about = in.readString();
+        houseID = in.readInt();
+
+    }
+
+        public static final Parcelable.Creator<Account> CREATOR = new Parcelable.Creator<Account>() {
+
+        public Account createFromParcel(Parcel in) {
+            return new Account(in);
+        }
+
+        public Account[] newArray(int size) {
+            return new Account[size];
+        }
+
+    };
 
 }
