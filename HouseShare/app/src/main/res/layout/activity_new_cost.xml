@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/background_light"
+    android:fitsSystemWindows="true">
+
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/cost.appbar"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:fitsSystemWindows="true"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+        <android.support.design.widget.CollapsingToolbarLayout
+            android:id="@+id/cost.collapsing"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fitsSystemWindows="true"
+            app:contentScrim="?attr/colorPrimary"
+            app:expandedTitleMarginEnd="64dp"
+            app:expandedTitleMarginStart="48dp"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed">
+
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/cost.toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:layout_collapseMode="pin"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+
+
+            <LinearLayout
+                android:id="@+id/title_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center|bottom"
+                android:orientation="horizontal"
+                app:layout_scrollFlags="scroll|enterAlways|snap"
+                android:layout_gravity="bottom"
+                android:padding="10dp">
+
+
+                <TextView
+                    android:id="@+id/CategoryTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:paddingRight="4dp"
+                    android:text="Category:"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionBar.Title" />
+
+
+                <Spinner
+                    android:id="@+id/CategorySpinner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                     />
+            </LinearLayout>
+
+
+        </android.support.design.widget.CollapsingToolbarLayout>
+    </android.support.design.widget.AppBarLayout>
+
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/activity_vertical_margin"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="@dimen/activity_vertical_margin"
+            tools:context=".Activities.NewCost">
+
+            <TextView
+                android:id="@+id/AmountTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_marginTop="4dp"
+                android:text="Amount"
+                android:textColor="#80000000" />
+
+
+            <EditText
+                android:id="@+id/Amount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/AmountTextView"
+                android:layout_marginTop="4dp"
+                android:inputType="numberDecimal"
+                android:textColor="#80000000" />
+
+
+            <TextView
+                android:id="@+id/startDateTextview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/Amount"
+                android:layout_marginTop="18dp"
+                android:text="Start Date"
+                android:textColor="#80000000" />
+
+
+            <Button
+                android:id="@+id/startDateButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/startDateTextview"
+                android:layout_toRightOf="@+id/startDate"
+                android:text="Select"
+
+                />
+
+
+            <TextView
+                android:id="@+id/startDate"
+                android:layout_width="220dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/startDateTextview"
+                android:layout_marginTop="4dp"
+                android:text="Choose Start Date"
+                android:textColor="#000000" />
+
+            <TextView
+                android:id="@+id/endDateTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/startDate"
+                android:layout_marginTop="18dp"
+                android:text="End Date"
+                android:textColor="#80000000" />
+
+
+            <Button
+                android:id="@+id/endDateButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/endDateTextView"
+                android:layout_toRightOf="@+id/endDate"
+                android:inputType="none"
+                android:text="Select" />
+
+
+            <TextView
+                android:id="@+id/endDate"
+                android:layout_width="220dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/endDateTextView"
+                android:layout_marginTop="4dp"
+                android:text="Optional End Date"
+                android:textColor="#000000" />
+
+
+            <TextView
+                android:id="@+id/IntervalTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/endDate"
+                android:layout_marginTop="4dp"
+                android:text="Interval"
+                android:textColor="#80000000" />
+
+            <Spinner
+                android:id="@+id/numberSpinner"
+                android:layout_width="100dp"
+                android:layout_height="60dp"
+                android:layout_alignBottom="@+id/IntervalSpinnerUI"
+                android:layout_alignParentStart="true"
+                android:layout_alignTop="@+id/IntervalSpinnerUI">
+
+            </Spinner>
+
+            <Spinner
+                android:id="@+id/IntervalSpinnerUI"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/IntervalTextView"
+                android:layout_toRightOf="@+id/numberSpinner">
+            </Spinner>
+
+        </RelativeLayout>
+
+
+    </android.support.v4.widget.NestedScrollView>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/cost.fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/activity_horizontal_margin"
+        android:foreground="@drawable/ic_add_12dp"
+        app:layout_anchor="@id/cost.appbar"
+        app:layout_anchorGravity="bottom|right|end" />
+</android.support.design.widget.CoordinatorLayout>

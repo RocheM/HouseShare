@@ -47,8 +47,6 @@ public class DetailsFragment extends Fragment{
     private GridView gridView;
 
 
-
-
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
@@ -57,6 +55,8 @@ public class DetailsFragment extends Fragment{
     public DetailsFragment() {
         // Required empty public constructor
     }
+
+
 
 
 
@@ -125,21 +125,11 @@ public class DetailsFragment extends Fragment{
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-
-                EventBus.getDefault().post(new AccountEvent(current, house));
+                EventBus.getDefault().post(new AccountEvent(house.getMembers().get(position), house));
             }
         });
     }
 
-
-    private void createAndShowDialog(String title, String message){
-
-        new MaterialDialog.Builder(this.getContext())
-                .title(title)
-                .content(message)
-                .positiveText("Ok")
-                .show();
-    }
 
 
     @Override
@@ -162,10 +152,6 @@ public class DetailsFragment extends Fragment{
         super.onDetach();
     }
 
-
-    private void setupAccount(){
-        lookupAccount(Profile.getCurrentProfile().getId());
-    }
 
     public void setupAzure(){
 
@@ -253,16 +239,5 @@ public class DetailsFragment extends Fragment{
         }.execute();
 
     }
-
-    private static class Item {
-        public final String name;
-        public final Bitmap image;
-
-        Item(String name, Bitmap image) {
-            this.name = name;
-            this.image = image;
-        }
-    }
-
 
 }

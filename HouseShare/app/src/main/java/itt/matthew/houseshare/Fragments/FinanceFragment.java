@@ -1,33 +1,37 @@
 package itt.matthew.houseshare.Fragments;
 
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.provider.DocumentsContract;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Spinner;
-import android.widget.Toast;
-
-import com.afollestad.materialdialogs.DialogAction;
-import com.afollestad.materialdialogs.MaterialDialog;
+import com.microsoft.windowsazure.mobileservices.MobileServiceClient;
+import com.microsoft.windowsazure.mobileservices.http.ServiceFilterResponse;
+import com.microsoft.windowsazure.mobileservices.table.MobileServiceTable;
+import com.microsoft.windowsazure.mobileservices.table.TableQueryCallback;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 import de.greenrobot.event.EventBus;
-import itt.matthew.houseshare.Models.Cost;
-import itt.matthew.houseshare.Events.DateMessage;
-import itt.matthew.houseshare.Models.Interval;
+import itt.matthew.houseshare.Activities.NewCost;
+import itt.matthew.houseshare.Adapters_CustomViews.RVAdapter;
 import itt.matthew.houseshare.Events.MessageEvent;
 import itt.matthew.houseshare.Events.ReplyEvent;
+import itt.matthew.houseshare.Events.RequestDetailsEvent;
+import itt.matthew.houseshare.Models.Account;
+import itt.matthew.houseshare.Models.House;
 import itt.matthew.houseshare.R;
 
 /**
@@ -47,12 +51,21 @@ public class FinanceFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-    private Button testButton, startDateButton, endDateButton;
-    private EditText startEdit, endEdit, category, amount;
-    private int day, month, year;
-    private Calendar startCalendar, endCalendar;
-    private Cost newCost;
-    private Spinner intervalSpinner;
+
+    ArrayAdapter<String> adapter;
+
+
+    private MobileServiceClient mClient;
+    private android.support.v7.widget.RecyclerView mRecyclerView;
+    private RVAdapter mAdapter;
+    private android.support.v7.widget.RecyclerView.LayoutManager mLayoutManager;
+
+    private MobileServiceTable<Account> mAccountTable;
+    private MobileServiceTable<House> mHouseTable;
+    private Account current_account;
+    private House current_house;
+
+
 
 
     public FinanceFragment() {
@@ -77,55 +90,68 @@ public class FinanceFragment extends Fragment {
         return fragment;
     }
 
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Bundle extra = getActivity().getIntent().getExtras().getBundle("extra");
+        current_account = extra.getParcelable("account");
+        current_house = extra.getParcelable("house");
+
+
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
     }
+
+
 
     @Override
     public void onStart() {
         super.onStart();
-
         EventBus.getDefault().register(this);
     }
 
     @Override
     public void onStop() {
         super.onStop();
-
         EventBus.getDefault().unregister(this);
     }
 
+
     public void onEvent(ReplyEvent event){
 
-        day = event.getDay();
-        month = event.getMonth();
-        year = event.getYear();
-
-
-
-
-        if(event.getType() == 's') {
-            startEdit.setText(Integer.toString(day) + "/" + Integer.toString(month) + "/" + Integer.toString(year));
-            startCalendar = new GregorianCalendar();
-            startCalendar.set(year, month, day);
-        }
-        else {
-            endEdit.setText(Integer.toString(day) + "/" + Integer.toString(month) + "/" + Integer.toString(year));
-            endCalendar = new GregorianCalendar();
-            endCalendar.set(year, month, day);
-        }
+        current_account = event.getAccount();
+        current_house = event.getHouse();
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_finance, container, false);
+
+
+
+
+        View rootView = inflater.inflate(R.layout.fragment_finance, container, false);
+
+        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.rv);
+
+        mLayoutManager = new LinearLayoutManager(getActivity());
+        mRecyclerView.setLayoutManager(mLayoutManager);
+
+
+        mRecyclerView.setAdapter(new RVAdapter(current_house));
+
+
+
+
+        return rootView;
     }
 
     @Override
@@ -133,114 +159,26 @@ public class FinanceFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         setupUI();
-    }
-
-    private int setUpInterval(int index){
-
-        switch (index) {
-            case 0:
-                return 1;
-            case 1:
-                return 7;
-            case 2:
-                return 30;
-            case 3:
-                return 365;
-        }
-
-        return 1;
-
+        populateItems();
     }
 
     private void setupUI(){
 
-        testButton = (Button)getView().findViewById(R.id.testButton);
 
-
-        FloatingActionButton fab = (FloatingActionButton) getView().findViewById(R.id.fab);
+        com.getbase.floatingactionbutton.FloatingActionButton fab = (com.getbase.floatingactionbutton.FloatingActionButton)getView().findViewById(R.id.action_a);
+        fab.setTitle("New Cost");
+        fab.setIcon(R.drawable.ic_note_add_24dp);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
-
-
-
-        testButton.setOnClickListener(new View.OnClickListener() {
-            @Override
             public void onClick(View v) {
-                boolean wrapInScrollView = true;
-                MaterialDialog d = new MaterialDialog.Builder(getContext())
-                        .title("New Cost")
-                        .customView(R.layout.add_dialog, wrapInScrollView)
-                        .positiveText("Create")
-                        .negativeText("Cancel")
-                        .onPositive(new MaterialDialog.SingleButtonCallback() {
-                            @Override
-                            public void onClick(MaterialDialog dialog, DialogAction which) {
 
-
-                                int intervalDays = setUpInterval(intervalSpinner.getSelectedItemPosition());
-
-                                ArrayList<Integer> integers = new ArrayList<Integer>();
-                                integers.add(0);
-                                integers.add(1);
-
-                                integers.add(2);
-
-                                newCost = new Cost(intervalDays, category.getText().toString(),
-                                                    Double.parseDouble(amount.getText().toString()),
-                                                    integers, startCalendar, endCalendar);
-
-                                Toast.makeText(getContext(), "Cost of category " + newCost.getCategory()
-                                        + " amount: " + newCost.getAmount() + " reoccuring every " + Integer.toString(intervalDays) + " days", Toast.LENGTH_LONG).show();
-                            }
-                        })
-                        .show();
-
-
-                startEdit = (EditText)d.getView().findViewById(R.id.startDate);
-                endEdit = (EditText)d.getView().findViewById(R.id.endDate);
-
-                intervalSpinner = (Spinner) d.findViewById(R.id.IntervalSpinner);
-                intervalSpinner.setAdapter(new ArrayAdapter<Interval>(getContext(), android.R.layout.simple_spinner_item, Interval.values()));
-
-
-                category = (EditText) d.findViewById(R.id.Category);
-                amount = (EditText) d.findViewById(R.id.Amount);
-
-
-                startDateButton = (Button)d.getView().findViewById(R.id.startDateButton);
-                startDateButton.setOnClickListener(new View.OnClickListener(){
-
-                    @Override
-                    public void onClick(View v) {
-
-                        EventBus.getDefault().post(new DateMessage(0, 0, 0, 's'));
-
-                    }
-                });
-
-                endDateButton = (Button) d.getView().findViewById(R.id.endDateButton);
-                endDateButton.setOnClickListener(new View.OnClickListener() {
-
-                    @Override
-                    public void onClick(View v) {
-
-                        EventBus.getDefault().post(new DateMessage(0, 0, 0, 'e'));
-
-                    }
-                });
-
-
+                EventBus.getDefault().post(new RequestDetailsEvent('h'));
             }
         });
 
 
     }
+
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
@@ -256,8 +194,7 @@ public class FinanceFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-
-        EventBus.getDefault().post(new MessageEvent("Finance", 1));
+        populateItems();
     }
 
     @Override
@@ -279,4 +216,28 @@ public class FinanceFragment extends Fragment {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
+
+
+    public void setupAzure(){
+
+
+        try {
+            mClient = new MobileServiceClient(
+                    "https://backendhs.azurewebsites.net",
+                    this.getActivity());
+
+        } catch (Exception e) {
+
+
+        }
+
+        mAccountTable = mClient.getTable(Account.class);
+        mHouseTable = mClient.getTable(House.class);
+    }
+
+
+    private void populateItems(){
+
+    }
+
 }

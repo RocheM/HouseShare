@@ -1,9 +1,6 @@
 package itt.matthew.houseshare.Models;
 
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
 
 /**
  * Created by Matthew on 24/01/2016.
@@ -12,18 +9,18 @@ public class Cost {
 
     private int ID;
     private int interval;
-    private String Category;
+    private CostCategory Category;
     private double amount;
-    private ArrayList<Integer> split;
+  //  private ArrayList<Integer> split;
     private Calendar StartDate;
     private Calendar EndDate;
 
-    public Cost(int interval, String Category, double amount, ArrayList<Integer> split, Calendar StartDate, Calendar EndDate ){
+    public Cost(int interval, CostCategory Category, double amount, Calendar StartDate, Calendar EndDate ){
 
         this.interval = interval;
         this.Category = Category;
         this.amount = amount;
-        this.split = split;
+       // this.split = split;
         this.StartDate = StartDate;
         this.EndDate = EndDate;
     }
@@ -43,14 +40,14 @@ public class Cost {
     public void setInterval(int interval) {
         this.interval = interval;
     }
-
-    public ArrayList<Integer> getSplit() {
-        return split;
-    }
-
-    public void setSplit(ArrayList<Integer> split) {
-        this.split = split;
-    }
+//
+//    public ArrayList<Integer> getSplit() {
+//        return split;
+//    }
+//
+//    public void setSplit(ArrayList<Integer> split) {
+//        this.split = split;
+//    }
 
     public Calendar getEndDate() {
         return EndDate;
@@ -68,11 +65,11 @@ public class Cost {
         StartDate = startDate;
     }
 
-    public String getCategory() {
+    public CostCategory getCategory() {
         return Category;
     }
 
-    public void setCategory(String category) {
+    public void setCategory(CostCategory category) {
         Category = category;
     }
 

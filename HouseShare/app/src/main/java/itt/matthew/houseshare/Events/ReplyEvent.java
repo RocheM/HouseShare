@@ -1,61 +1,36 @@
 package itt.matthew.houseshare.Events;
 
+import itt.matthew.houseshare.Models.Account;
+import itt.matthew.houseshare.Models.House;
+
 /**
  * Created by Matthew on 24/01/2016.
  */
 public class ReplyEvent {
 
 
-    private int  day;
-    private int month;
-    private int year;
-    private char type;
+    private House house;
+    private Account account;
 
-    public ReplyEvent(int day, int month, int year, char type){
+    public ReplyEvent(House house, Account account) {
 
-        this.day = day;
-        this.month = month;
-        this.year = year;
-        this.type = type;
+        this.account = account;
+        this.house = house;
     }
 
-    public ReplyEvent(int day, int month, int year){
-
-        this.day = day;
-        this.month = month;
-        this.year = year;
-        type = 'n';
+    public House getHouse() {
+        return house;
     }
 
-    public int getDay() {
-        return day;
+    public void setHouse(House house) {
+        this.house = house;
     }
 
-    public void setDay(int day) {
-        this.day = day;
+    public void setAccount(Account account) {
+        this.account = account;
     }
 
-    public int getMonth() {
-        return month;
-    }
-
-    public void setMonth(int month) {
-        this.month = month;
-    }
-
-    public int getYear() {
-        return year;
-    }
-
-    public void setYear(int year) {
-        this.year = year;
-    }
-
-    public char getType() {
-        return type;
-    }
-
-    public void setType(char type) {
-        this.type = type;
+    public Account getAccount() {
+        return account;
     }
 }

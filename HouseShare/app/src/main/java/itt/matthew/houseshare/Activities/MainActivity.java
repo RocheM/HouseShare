@@ -27,22 +27,21 @@ import com.microsoft.windowsazure.mobileservices.table.MobileServiceTable;
 import com.microsoft.windowsazure.mobileservices.table.TableQueryCallback;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 import de.greenrobot.event.*;
+import itt.matthew.houseshare.Events.RequestDetailsEvent;
 import itt.matthew.houseshare.Fragments.DetailsFragment;
 import itt.matthew.houseshare.Fragments.FinanceFragment;
 import itt.matthew.houseshare.Fragments.TasksFragment;
 import itt.matthew.houseshare.Models.Account;
 import itt.matthew.houseshare.Events.AccountEvent;
-import itt.matthew.houseshare.Events.DateMessage;
 import itt.matthew.houseshare.Models.House;
 import itt.matthew.houseshare.Events.MessageEvent;
 import itt.matthew.houseshare.Events.ReplyEvent;
 import itt.matthew.houseshare.R;
 
-public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener, com.wdullaer.materialdatetimepicker.date.DatePickerDialog.OnDateSetListener{
+public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener{
 
     private MobileServiceClient mClient;
     private MobileServiceTable<Account> mAccountTable;
@@ -54,7 +53,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private ListView navList;
     private FragmentTransaction fragmentTransaction;
     private FragmentManager fragmentManager;
-    private char dateType = 'n';
 
 
     @Override
@@ -70,28 +68,32 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         super.onStop();
     }
 
+    public void onResume(){
+        super.onResume();
+        lookupHouse();
+    }
+
     public void onEvent(AccountEvent event){
         Bundle bundle = new Bundle();
         bundle.putParcelable("account", event.account);
         bundle.putParcelable("house", event.house);
-       // loadSelectionWithBundle(3, bundle);
+
         startAccountActivity(bundle);
 
     }
 
-    public void onEvent(DateMessage event){
 
+    public void onEvent(RequestDetailsEvent event){
+        if (event.getRequestFlag() == 'h') {
 
-        dateType = event.getType();
-        Calendar now = Calendar.getInstance();
-        com.wdullaer.materialdatetimepicker.date.DatePickerDialog dpd = com.wdullaer.materialdatetimepicker.date.DatePickerDialog.newInstance(
-                MainActivity.this,
-                now.get(Calendar.YEAR),
-                now.get(Calendar.MONTH),
-                now.get(Calendar.DAY_OF_MONTH)
-        );
-        dpd.show(getFragmentManager(), "Datepickerdialog");
+            Bundle bundle = new Bundle();
+            bundle.putParcelable("account", current);
+            bundle.putParcelable("house", house);
 
+            startCostActivity(bundle);
+        }
+        else if (event.getRequestFlag() == 'f')
+            EventBus.getDefault().post(new ReplyEvent(house, current));
 
     }
 
@@ -113,12 +115,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
 
         navList = (ListView)findViewById(R.id.navList);
-        ArrayList<String> navArray = new ArrayList<String>();
+        ArrayList<String> navArray = new ArrayList<>();
         navArray.add("My House");
         navArray.add("Finance");
         navArray.add("Tasks");
         navList.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_activated_1,navArray);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,android.R.layout.simple_list_item_activated_1,navArray);
         navList.setAdapter(adapter);
         navList.setOnItemClickListener(this);
 
@@ -148,21 +150,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
 
-    private void loadSelectionWithBundle(int i, Bundle bundle){
-        switch (i){
-            case 3:
-                AccountDetails accountFragment = new AccountDetails();
-                accountFragment.setArguments(bundle);
-                Account acc  = bundle.getParcelable("account");
-                setTitle(acc.getName());
-                fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.fragmentHolder, accountFragment);
-                fragmentTransaction.addToBackStack(accountFragment.getTag());
-                fragmentTransaction.commit();
-                break;
-        }
+    private void startCostActivity(Bundle b){
 
+        Intent i = new Intent(this, NewCost.class);
+        i.putExtra("extra", b);
+        startActivity(i);
     }
+
 
     private void loadSelection(int i){
         navList.setItemChecked(i, true);
@@ -177,9 +171,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 fragmentTransaction.commit();
                 break;
             case 1:
+
                 FinanceFragment financeFragment = new FinanceFragment();
                 setTitle("House Finances");
                 fragmentTransaction = fragmentManager.beginTransaction();
+                Bundle b = new Bundle();
+                b.putParcelable("house", house);
+                b.putParcelable("account", current);
+                getIntent().putExtra("extra", b);
                 fragmentTransaction.replace(R.id.fragmentHolder, financeFragment);
                 fragmentTransaction.addToBackStack(financeFragment.getTag());
                 fragmentTransaction.commit();
@@ -217,7 +216,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         return super.onOptionsItemSelected(item);
     }
 
-    public void setupAzure(){
+    private void setupAzure(){
 
 
         try {
@@ -225,6 +224,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     "https://backendhs.azurewebsites.net",
                     this
             );
+
 
         } catch (Exception e) {
             new MaterialDialog.Builder(this)
@@ -240,7 +240,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
 
-    public void lookupAccount(final String facebookID) {
+    private void lookupAccount(final String facebookID) {
 
 
         new AsyncTask<Void, Void, Void>() {
@@ -274,7 +274,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }.execute();
     }
 
-    public void lookupHouse(){
+    private void lookupHouse(){
 
         new AsyncTask<Void, Void, Void>() {
 
@@ -342,13 +342,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     public void onFragmentInteraction(){
 
-
-    }
-
-    @Override
-    public void onDateSet(com.wdullaer.materialdatetimepicker.date.DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
-
-        EventBus.getDefault().post(new ReplyEvent(year, monthOfYear, dayOfMonth, dateType));
 
     }
 }

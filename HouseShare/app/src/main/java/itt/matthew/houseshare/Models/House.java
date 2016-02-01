@@ -15,6 +15,8 @@ import org.json.JSONObject;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 /**
@@ -25,6 +27,8 @@ public class House implements Parcelable {
     private String ID;
     private int HouseID;
     private String members;
+    private String costs;
+    private String costCategories;
     private String name;
     private String description;
 
@@ -32,8 +36,35 @@ public class House implements Parcelable {
 
         this.name = name;
         this.description = description;
+
+        if (costCategories == null){
+            setUpCostCategories();
+        }
     }
 
+
+    private void setUpCostCategories(){
+
+        CostCategory Rent = new CostCategory("Rent", -65536);
+        CostCategory Internet = new CostCategory("Internet", -16776961);
+        CostCategory Gas = new CostCategory("Gas", -7829368);
+        CostCategory Electricity = new CostCategory("Electricity", -256);
+
+        ArrayList<CostCategory> categories = new ArrayList<CostCategory>();
+        categories.add(Rent);
+        categories.add(Internet);
+        categories.add(Gas);
+        categories.add(Electricity);
+
+        ArrayList<Cost> costs = new ArrayList<Cost>();
+//        Calendar test = new GregorianCalendar();
+//        test = Calendar.getInstance();
+//        costs.add(new Cost(0, categories.get(0), 1.0, test, test));
+
+        setCosts(costs);
+        setCostCategories(categories);
+
+    }
 
     public House(Parcel in){
         readFromParcel(in);
@@ -73,7 +104,6 @@ public class House implements Parcelable {
         JsonParser parser = new JsonParser();
         JsonArray o = parser.parse(members).getAsJsonArray();
 
-      //  Account[] deserializedMembers = gson.fromJson(o, Account[].class);
         ArrayList<Account> toReturn = new ArrayList<Account>();
 
 
@@ -95,6 +125,71 @@ public class House implements Parcelable {
 
     }
 
+    public ArrayList<Cost> getCost() { return getCostFromJSON();}
+
+
+    private ArrayList<Cost> getCostFromJSON(){
+
+        final Gson gson = new Gson();
+
+        JsonParser parser = new JsonParser();
+        JsonArray o = parser.parse(costs).getAsJsonArray();
+
+        ArrayList<Cost> toReturn = new ArrayList<Cost>();
+
+
+        for (int i = 0; i < o.size(); i++) {
+            toReturn.add(gson.fromJson(o.get(i), Cost.class));
+        }
+
+
+        return toReturn;
+    }
+
+
+    public void setCosts(ArrayList<Cost> toUpload){
+
+        final Gson gson = new Gson();
+
+        Type listOfTestObject = new TypeToken<ArrayList<Cost>>(){}.getType();
+        costs = gson.toJson(toUpload, listOfTestObject);
+
+    }
+
+
+    public ArrayList<CostCategory> getCostCategory() { return getCostCategoryFromJSON();}
+
+
+    private ArrayList<CostCategory> getCostCategoryFromJSON(){
+
+        final Gson gson = new Gson();
+
+        JsonParser parser = new JsonParser();
+        JsonArray o = parser.parse(costCategories).getAsJsonArray();
+
+        ArrayList<CostCategory> toReturn = new ArrayList<CostCategory>();
+
+
+        for (int i = 0; i < o.size(); i++) {
+            toReturn.add(gson.fromJson(o.get(i), CostCategory.class));
+        }
+
+
+        return toReturn;
+    }
+
+
+    public void setCostCategories(ArrayList<CostCategory> toUpload){
+
+        final Gson gson = new Gson();
+
+        Type listOfTestObject = new TypeToken<ArrayList<CostCategory>>(){}.getType();
+        costCategories = gson.toJson(toUpload, listOfTestObject);
+
+    }
+
+
+
     @Override
     public int describeContents() {
         return 0;
@@ -103,9 +198,12 @@ public class House implements Parcelable {
     @Override
     public void writeToParcel(Parcel out, int flags) {
 
+
         out.writeString(ID);
         out.writeInt(HouseID);
         out.writeString(members);
+        out.writeString(costs);
+        out.writeString(costCategories);
         out.writeString(name);
         out.writeString(description);
     }
@@ -116,6 +214,8 @@ public class House implements Parcelable {
         ID = in.readString();
         HouseID = in.readInt();
         members = in.readString();
+        costs = in.readString();
+        costCategories = in.readString();
         name = in.readString();
         description = in.readString();
     }

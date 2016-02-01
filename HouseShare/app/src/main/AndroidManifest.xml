@@ -45,7 +45,13 @@
         <activity
             android:name=".CreateCost"
             android:label="@string/title_activity_create_cost"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+
+
+        <activity android:name=".Activities.NewCost"
+                android:label="NewCost"
+                android:theme="@style/AppTheme.NoActionBar"/>
+
     </application>
 
 </manifest>

@@ -1,6 +1,7 @@
 package itt.matthew.houseshare.Activities;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.TabLayout;
@@ -13,6 +14,7 @@ import android.os.Bundle;
 import android.util.AttributeSet;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -89,8 +91,8 @@ public class AccountActivity extends AppCompatActivity implements AppBarLayout.O
         name.setText(account.getName());
         subtitle.setText("Member of " + house.getName() + " house");
 
-        getBackgroundPicture();
-
+       // getBackgroundPicture();
+        Picasso.with(this).load("https://graph.facebook.com/" + account.getFacebookID() + "/picture?type=large").into(backdrop);
         Picasso.with(this).load("https://graph.facebook.com/" + account.getFacebookID() + "/picture?type=large").into(profile);
 
         setSupportActionBar(toolbar);
@@ -135,7 +137,7 @@ public class AccountActivity extends AppCompatActivity implements AppBarLayout.O
         @Override
         public Fragment getItem(int i) {
             switch(i) {
-                case 0: return FinanceFragment.newInstance("Test", "Test");
+                case 0: return TasksFragment.newInstance("Test", "Test");
                 case 1: return TasksFragment.newInstance("Test", "Test");
             }
             return null;
