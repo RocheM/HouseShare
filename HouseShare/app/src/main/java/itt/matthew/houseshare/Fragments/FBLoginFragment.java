@@ -1,5 +1,7 @@
 package itt.matthew.houseshare.Fragments;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -27,7 +29,12 @@ import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
 
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.microsoft.windowsazure.mobileservices.*;
+import com.microsoft.windowsazure.mobileservices.authentication.MobileServiceAuthenticationProvider;
+import com.microsoft.windowsazure.mobileservices.authentication.MobileServiceUser;
 import com.microsoft.windowsazure.mobileservices.http.ServiceFilterResponse;
 import com.microsoft.windowsazure.mobileservices.table.MobileServiceTable;
 import com.microsoft.windowsazure.mobileservices.table.TableOperationCallback;
@@ -35,6 +42,7 @@ import com.microsoft.windowsazure.mobileservices.table.TableQueryCallback;
 
 import org.json.JSONObject;
 
+import java.security.AuthProvider;
 import java.util.Arrays;
 import java.util.List;
 
@@ -78,8 +86,11 @@ public class FBLoginFragment extends Fragment {
         public void onSuccess(LoginResult loginResult) {
             Profile profile = Profile.getCurrentProfile();
 
+
             details.setText(constructWelcomeMessage(profile));
             checkIfExists();
+
+
 
         }
 
@@ -135,6 +146,8 @@ public class FBLoginFragment extends Fragment {
         mTokenTracker.startTracking();
         mProfileTracker.startTracking();
 
+
+
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -142,7 +155,6 @@ public class FBLoginFragment extends Fragment {
 
         }
     }
-
 
     private void setupAzure() {
 
@@ -341,10 +353,9 @@ public class FBLoginFragment extends Fragment {
                                 startJoinHouseActivity();
                             } else
                                 progress.hide();
-                                startMainActivity();
+                            startMainActivity();
                         }
-                    }
-                    else {
+                    } else {
                         exception.printStackTrace();
                     }
                 }
@@ -379,6 +390,7 @@ public class FBLoginFragment extends Fragment {
                                                     String birthday;
                                                     String location;
                                                     String about;
+                                                    String url;
 
                                                     try {
                                                         birthday = JSONresponse.getString("birthday");
@@ -402,13 +414,20 @@ public class FBLoginFragment extends Fragment {
                                                     } catch (Exception ex) {
                                                         ex.printStackTrace();
                                                     }
+                                                    try {
+                                                        url = JSONresponse.getJSONObject("cover").getString("source");
+                                                        newAccount.setCoverPhotoURL(url);
+                                                    } catch (Exception ex){
+                                                        ex.printStackTrace();
+                                                    }
+
                                                     upload(newAccount);
                                                 }
 
                                             });
 
                                     Bundle parameters = new Bundle();
-                                    parameters.putString("fields", "id,name,bio,birthday,location");
+                                    parameters.putString("fields", "id,name,bio,birthday,location,cover");
                                     request.setParameters(parameters);
                                     request.executeAsync();
                                 }
@@ -427,6 +446,7 @@ public class FBLoginFragment extends Fragment {
 }
 
     public void upload(Account item) {
+
         mClient.getTable(Account.class).insert(item, new TableOperationCallback<Account>() {
             public void onCompleted(Account entity, Exception exception, ServiceFilterResponse response) {
                 if (exception == null) {

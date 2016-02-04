@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.w3c.dom.Text;
 
@@ -21,7 +22,7 @@ import itt.matthew.houseshare.Models.Cost;
 import itt.matthew.houseshare.Models.House;
 import itt.matthew.houseshare.R;
 
-public class RVAdapter extends RecyclerView.Adapter<RVAdapter.PersonViewHolder>{
+public class RVAdapter extends RecyclerView.Adapter<RVAdapter.PersonViewHolder>  {
 
     public static class PersonViewHolder extends RecyclerView.ViewHolder {
         CardView cv;
@@ -33,6 +34,8 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.PersonViewHolder>{
 
         PersonViewHolder(View itemView) {
             super(itemView);
+
+
             cv = (CardView)itemView.findViewById(R.id.cv);
             CostCategory = (TextView)itemView.findViewById(R.id.category_name);
             CostDate = (TextView)itemView.findViewById(R.id.cost_dates);
@@ -54,9 +57,18 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.PersonViewHolder>{
         return persons.getCost().size();
     }
 
+
     @Override
-    public PersonViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+    public PersonViewHolder onCreateViewHolder(final ViewGroup viewGroup, int i) {
         View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.card_item, viewGroup, false);
+        v.setClickable(true);
+        v.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+              //  Toast.makeText(v.getContext(), "Item Clicked is ", Toast.LENGTH_SHORT).show();
+            }
+        });
         PersonViewHolder pvh = new PersonViewHolder(v);
         return pvh;
     }
@@ -69,18 +81,21 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.PersonViewHolder>{
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MMM/yyyy");
 
 
+
         personViewHolder.CostCategory.setText(costs.get(i).getCategory().getName());
+        personViewHolder.CostCategory.setTextColor(costs.get(i).getCategory().getColor());
         personViewHolder.CostDate.setText(formatter.format(costs.get(i).getStartDate().getTime()) + " to " + formatter.format(costs.get(i).getEndDate().getTime()));
         personViewHolder.CostInterval.setText(Integer.toString(costs.get(i).getInterval()));
         personViewHolder.CostAmount.setText(Double.toString(costs.get(i).getAmount()));
         personViewHolder.CostColor.setBackgroundColor(costs.get(i).getCategory().getColor());
-        personViewHolder.CostColor.setImageResource(R.drawable.ic_person_24dp);
+//        personViewHolder.CostColor.setImageResource(R.drawable.ic_person_24dp);
     }
 
     @Override
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
     }
+
 
 }
 

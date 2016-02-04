@@ -1,7 +1,10 @@
 package itt.matthew.houseshare.Activities;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.PointF;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.TabLayout;
@@ -11,17 +14,22 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.graphics.Palette;
 import android.util.AttributeSet;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.facebook.AccessToken;
+import com.facebook.FacebookActivity;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import org.json.JSONObject;
 
@@ -30,6 +38,11 @@ import itt.matthew.houseshare.Fragments.TasksFragment;
 import itt.matthew.houseshare.Models.Account;
 import itt.matthew.houseshare.Models.House;
 import itt.matthew.houseshare.R;
+import jp.wasabeef.picasso.transformations.BlurTransformation;
+import jp.wasabeef.picasso.transformations.ColorFilterTransformation;
+import jp.wasabeef.picasso.transformations.CropCircleTransformation;
+import jp.wasabeef.picasso.transformations.gpu.KuwaharaFilterTransformation;
+import jp.wasabeef.picasso.transformations.gpu.VignetteFilterTransformation;
 
 public class AccountActivity extends AppCompatActivity implements AppBarLayout.OnOffsetChangedListener {
 
@@ -41,9 +54,12 @@ public class AccountActivity extends AppCompatActivity implements AppBarLayout.O
     private String imageLocation;
     private TextView subtitle;
     private android.support.v7.widget.Toolbar toolbar;
+    private AppBarLayout appbar;
     private int mMaxScrollSize;
     private static final int PERCENTAGE_TO_ANIMATE_AVATAR = 20;
     private boolean mIsAvatarShown = true;
+    private Target loadtarget;
+
 
 
     @Override
@@ -87,13 +103,13 @@ public class AccountActivity extends AppCompatActivity implements AppBarLayout.O
         toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.toolbar);
         name = (TextView) findViewById(R.id.account_name);
         subtitle = (TextView) findViewById(R.id.account_subtitle);
+        appbar = (AppBarLayout) findViewById(R.id.appbar);
 
         name.setText(account.getName());
         subtitle.setText("Member of " + house.getName() + " house");
 
-       // getBackgroundPicture();
-        Picasso.with(this).load("https://graph.facebook.com/" + account.getFacebookID() + "/picture?type=large").into(backdrop);
-        Picasso.with(this).load("https://graph.facebook.com/" + account.getFacebookID() + "/picture?type=large").into(profile);
+        Picasso.with(getApplicationContext()).load("https://graph.facebook.com/" + account.getFacebookID() + "/picture?type=large").into(profile);
+        loadBitmap(account.getCoverPhotoURL());
 
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -124,6 +140,48 @@ public class AccountActivity extends AppCompatActivity implements AppBarLayout.O
         }
     }
 
+
+    public void loadBitmap(String url) {
+
+        if (loadtarget == null) loadtarget = new Target() {
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                // do something with the Bitmap
+                handleLoadedBitmap(bitmap);
+            }
+
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+
+            }
+
+            @Override
+            public void onBitmapFailed(Drawable errorDrawable) {
+
+            }
+        };
+        Picasso.with(this).load(url).into(loadtarget);
+    }
+
+    public void handleLoadedBitmap(Bitmap b) {
+
+
+
+        Palette.from(b).generate(new Palette.PaletteAsyncListener() {
+            public void onGenerated(Palette p) {
+                toolbar.setBackgroundColor(p.getVibrantColor(getResources().getColor(R.color.colorPrimary)));
+                appbar.setBackgroundColor(p.getVibrantColor(getResources().getColor(R.color.colorPrimary)));
+
+
+                Picasso.with(getApplicationContext()).load(account.getCoverPhotoURL()).into(backdrop);
+
+
+            }
+        });
+
+    }
+
     class TabsAdapter extends FragmentPagerAdapter {
         public TabsAdapter(FragmentManager fm) {
             super(fm);
@@ -151,52 +209,6 @@ public class AccountActivity extends AppCompatActivity implements AppBarLayout.O
             }
             return "";
         }
-    }
-
-
-    private Void getBackgroundPicture(){
-
-        new AsyncTask<Void, Void, Void>() {
-
-            JSONObject JSONresponse;
-
-            @Override
-            protected Void doInBackground(Void... params) {
-
-
-                GraphRequest request = GraphRequest.newMeRequest(
-                        AccessToken.getCurrentAccessToken(),
-                        new GraphRequest.GraphJSONObjectCallback() {
-                            ;
-                            @Override
-                            public void onCompleted(JSONObject object, GraphResponse response) {
-
-                                JSONresponse = object;
-
-                                try {
-                                   JSONObject obj =  object.getJSONObject("cover");
-                                    imageLocation = obj.getString("source");
-                                    populateImage();
-
-
-                                }catch (Exception ex){
-                                    ex.printStackTrace();
-                                }
-                            }
-                        });
-
-                Bundle parameters = new Bundle();
-                parameters.putString("fields", "cover");
-                request.setParameters(parameters);
-                request.executeAsync();
-
-
-
-                return null;
-            }
-
-        }.execute();
-        return null;
     }
 
     private void populateImage(){

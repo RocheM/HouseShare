@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.facebook.Profile;
@@ -125,7 +126,7 @@ public class DetailsFragment extends Fragment{
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                EventBus.getDefault().post(new AccountEvent(house.getMembers().get(position), house));
+                EventBus.getDefault().post(new AccountEvent(current, house));
             }
         });
     }

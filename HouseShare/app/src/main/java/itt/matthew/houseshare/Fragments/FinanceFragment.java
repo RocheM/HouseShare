@@ -14,6 +14,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Toast;
+
 import com.microsoft.windowsazure.mobileservices.MobileServiceClient;
 import com.microsoft.windowsazure.mobileservices.http.ServiceFilterResponse;
 import com.microsoft.windowsazure.mobileservices.table.MobileServiceTable;
@@ -52,7 +54,7 @@ public class FinanceFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    ArrayAdapter<String> adapter;
+    RVAdapter adapter;
 
 
     private MobileServiceClient mClient;
@@ -145,8 +147,18 @@ public class FinanceFragment extends Fragment {
         mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);
 
+        adapter = new RVAdapter(current_house);
 
-        mRecyclerView.setAdapter(new RVAdapter(current_house));
+        mRecyclerView.setAdapter(adapter);
+        mRecyclerView.setClickable(true);
+        mRecyclerView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+               int pos = mRecyclerView.getChildAdapterPosition(v);
+                Toast.makeText(getContext(), "You selected " + current_house.getCost().get(pos).getCategory().getName(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
 
 
 
@@ -201,6 +213,7 @@ public class FinanceFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
     }
+
 
     /**
      * This interface must be implemented by activities that contain this

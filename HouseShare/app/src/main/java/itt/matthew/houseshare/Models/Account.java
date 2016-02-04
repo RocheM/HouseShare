@@ -17,15 +17,17 @@ public class Account implements Parcelable {
     private String birthday;
     private String location;
     private String about;
+    private String coverPhotoURL;
     private int houseID;
 
-    public Account(String facebookID, String name, String birthday, String location, String about){
+    public Account(String facebookID, String name, String birthday, String location, String about, String coverPhotoURL){
 
         this.facebookID = facebookID;
         this.name = name;
         this.birthday = birthday;
         this.location = location;
         this.about = about;
+        this.coverPhotoURL = coverPhotoURL;
 
     }
 
@@ -81,6 +83,14 @@ public class Account implements Parcelable {
 
     public void setHouseID(int houseID) {this.houseID = houseID; }
 
+    public String getCoverPhotoURL() {
+        return coverPhotoURL;
+    }
+
+    public void setCoverPhotoURL(String coverPhotoURL) {
+        this.coverPhotoURL = coverPhotoURL;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -95,6 +105,7 @@ public class Account implements Parcelable {
         out.writeString(birthday);
         out.writeString(location);
         out.writeString(about);
+        out.writeString(coverPhotoURL);
         out.writeInt(houseID);
     }
     private void readFromParcel(Parcel in) {
@@ -105,6 +116,7 @@ public class Account implements Parcelable {
         birthday = in.readString();
         location = in.readString();
         about = in.readString();
+        coverPhotoURL = in.readString();
         houseID = in.readInt();
 
     }
