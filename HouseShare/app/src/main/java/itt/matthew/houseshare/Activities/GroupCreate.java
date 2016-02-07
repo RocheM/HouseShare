@@ -47,6 +47,8 @@ public class GroupCreate extends AppCompatActivity {
         final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        setupData();
+
 
         try {
             mClient = new MobileServiceClient(
@@ -78,10 +80,8 @@ public class GroupCreate extends AppCompatActivity {
                 toUp = new House(name, description);
 
 
-                Account current = new Account(Profile.getCurrentProfile().getId(), Profile.getCurrentProfile().getName());
-
                 ArrayList<Account> members = new ArrayList<Account>();
-                members.add(current);
+                members.add(workingAccount);
                 toUp.setMembers(members);
 
                 setID(toUp);
@@ -93,13 +93,20 @@ public class GroupCreate extends AppCompatActivity {
 
     }
 
+    private void setupData(){
+
+        Bundle b = getIntent().getBundleExtra("Bundle");
+        workingAccount = b.getParcelable("Account");
+
+    }
+
     public void setID(final House item){
 
         mHouseTable.select("id").execute(new TableQueryCallback<House>() {
             @Override
             public void onCompleted(List<House> result, int count, Exception exception, ServiceFilterResponse response) {
                if (exception == null) {
-                       item.setID(count + 1);
+                       item.setHouseID(count + 1);
                        getAccount(item);
                }
                 else
@@ -125,13 +132,17 @@ public class GroupCreate extends AppCompatActivity {
 
     public void upload(House item) {
 
-
+        toUp = new House(item);
 
         mClient.getTable(House.class).insert(item, new TableOperationCallback<House>() {
             public void onCompleted(House entity, Exception exception, ServiceFilterResponse response) {
                 if (exception == null) {
 
                   Intent i = new Intent(getApplicationContext(), MainActivity.class);
+                  Bundle b = new Bundle();
+                  b.putParcelable("House", toUp);
+                  b.putParcelable("Account", workingAccount);
+                  i.putExtra("Bundle", b);
                   startActivity(i);
 
                 } else {

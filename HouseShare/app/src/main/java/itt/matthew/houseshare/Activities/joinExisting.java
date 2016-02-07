@@ -1,6 +1,7 @@
 package itt.matthew.houseshare.Activities;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -30,15 +31,16 @@ public class joinExisting extends AppCompatActivity {
     private MobileServiceTable<House> mHouseTable;
     private MobileServiceTable<Account> mAccountTable;
     private Account currentUser;
+    private House currentHouse;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_join_existing);
 
-        setupUI();
         setupAzure();
-
+        setupData();
+        setupUI();
     }
 
     public void setupAzure() {
@@ -57,6 +59,14 @@ public class joinExisting extends AppCompatActivity {
 
         mHouseTable = mClient.getTable(House.class);
         mAccountTable = mClient.getTable(Account.class);
+    }
+
+
+    private void setupData(){
+
+        Bundle b = getIntent().getBundleExtra("Bundle");
+        currentUser = b.getParcelable("Account");
+
     }
 
     public void setupUI() {
@@ -107,6 +117,7 @@ public class joinExisting extends AppCompatActivity {
                     ArrayList<Account> updateHouse = item.getMembers();
                     updateHouse.add(currentUser);
                     item.setMembers(updateHouse);
+                    currentHouse = new House(item);
                     mHouseTable.update(item);
 
                     startMainActivity();
@@ -120,6 +131,11 @@ public class joinExisting extends AppCompatActivity {
     public void startMainActivity() {
 
         Intent i = new Intent(getApplicationContext(), MainActivity.class);
+        Bundle b = new Bundle();
+        b.putParcelable("Account", currentUser);
+        b.putParcelable("House", currentHouse);
+        i.putExtra("Bundle", b);
+
         startActivity(i);
 
     }

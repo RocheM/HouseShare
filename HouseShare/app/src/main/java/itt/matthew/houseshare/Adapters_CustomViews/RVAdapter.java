@@ -24,6 +24,10 @@ import itt.matthew.houseshare.R;
 
 public class RVAdapter extends RecyclerView.Adapter<RVAdapter.PersonViewHolder>  {
 
+
+    private House persons;
+    private RecyclerView recyclerView;
+
     public static class PersonViewHolder extends RecyclerView.ViewHolder {
         CardView cv;
         TextView CostCategory;
@@ -31,10 +35,11 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.PersonViewHolder> 
         TextView CostInterval;
         TextView CostAmount;
         ImageView CostColor;
+        Cost currentItem;
+
 
         PersonViewHolder(View itemView) {
             super(itemView);
-
 
             cv = (CardView)itemView.findViewById(R.id.cv);
             CostCategory = (TextView)itemView.findViewById(R.id.category_name);
@@ -42,10 +47,16 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.PersonViewHolder> 
             CostInterval = (TextView)itemView.findViewById(R.id.costs_interval);
             CostAmount = (TextView) itemView.findViewById(R.id.cost_amount);
             CostColor = (ImageView)itemView.findViewById(R.id.color_code);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(v.getContext(), currentItem.getCategory().getName(), Toast.LENGTH_LONG).show();
+
+                }
+            });
         }
     }
-
-    House persons;
 
     public RVAdapter(House persons){
         this.persons = persons;
@@ -57,20 +68,11 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.PersonViewHolder> 
         return persons.getCost().size();
     }
 
-
     @Override
     public PersonViewHolder onCreateViewHolder(final ViewGroup viewGroup, int i) {
-        View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.card_item, viewGroup, false);
-        v.setClickable(true);
-        v.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
 
-              //  Toast.makeText(v.getContext(), "Item Clicked is ", Toast.LENGTH_SHORT).show();
-            }
-        });
-        PersonViewHolder pvh = new PersonViewHolder(v);
-        return pvh;
+        View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.card_item, viewGroup, false);
+        return new PersonViewHolder(v);
     }
 
     @Override
@@ -89,12 +91,16 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.PersonViewHolder> 
         personViewHolder.CostAmount.setText(Double.toString(costs.get(i).getAmount()));
         personViewHolder.CostColor.setBackgroundColor(costs.get(i).getCategory().getColor());
 //        personViewHolder.CostColor.setImageResource(R.drawable.ic_person_24dp);
+
+        personViewHolder.currentItem = costs.get(i);
+
     }
 
     @Override
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
     }
+
 
 
 }

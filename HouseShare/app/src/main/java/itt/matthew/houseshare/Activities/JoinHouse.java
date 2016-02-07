@@ -9,19 +9,29 @@ import android.widget.TextView;
 
 import com.facebook.Profile;
 
+import itt.matthew.houseshare.Models.Account;
 import itt.matthew.houseshare.R;
 
 public class JoinHouse extends AppCompatActivity {
 
     private TextView welcomeMessage;
     private Button createHouseButton, joinHouseButton;
+    private Account current;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_join_house);
 
+
+        setupData();
         setupUI();
+    }
+
+    private void setupData(){
+
+        Bundle b = getIntent().getBundleExtra("Bundle");
+        current = b.getParcelable("Account");
 
     }
 
@@ -33,6 +43,9 @@ public class JoinHouse extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(getApplicationContext(),GroupCreate.class);
+                Bundle b = new Bundle();
+                b.putParcelable("Account", current);
+                i.putExtra("Bundle", b);
                 startActivity(i);
             }
         });
@@ -42,6 +55,9 @@ public class JoinHouse extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(getApplicationContext(),joinExisting.class);
+                Bundle b = new Bundle();
+                b.putParcelable("Account", current);
+                i.putExtra("Bundle", b);
                 startActivity(i);
             }
         });

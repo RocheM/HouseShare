@@ -126,7 +126,7 @@ public class DetailsFragment extends Fragment{
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                EventBus.getDefault().post(new AccountEvent(current, house));
+                EventBus.getDefault().post(new AccountEvent(house.getMembers().get(position), house));
             }
         });
     }
@@ -221,7 +221,7 @@ public class DetailsFragment extends Fragment{
                                          @Override
                                          public void onCompleted(List<House> result, int count, Exception exception, ServiceFilterResponse response) {
                                              if (exception == null) {
-                                                 house = result.get(0);
+                                                 house = new House(result.get(0));
                                                  loadImages();
 
                                              } else

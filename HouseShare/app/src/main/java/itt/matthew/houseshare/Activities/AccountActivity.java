@@ -170,12 +170,23 @@ public class AccountActivity extends AppCompatActivity implements AppBarLayout.O
 
         Palette.from(b).generate(new Palette.PaletteAsyncListener() {
             public void onGenerated(Palette p) {
-                toolbar.setBackgroundColor(p.getVibrantColor(getResources().getColor(R.color.colorPrimary)));
-                appbar.setBackgroundColor(p.getVibrantColor(getResources().getColor(R.color.colorPrimary)));
+
+                if (p.getDarkVibrantColor(getResources().getColor(R.color.colorPrimary)) == getResources().getColor(R.color.colorPrimary)) {
+
+                    toolbar.setBackgroundColor(p.getMutedColor(getResources().getColor(R.color.colorPrimary)));
+                    appbar.setBackgroundColor(p.getMutedColor(getResources().getColor(R.color.colorPrimary)));
+
+
+                } else if (p.getMutedColor(getResources().getColor(R.color.colorPrimary)) == getResources().getColor(R.color.colorPrimary)) {
+                    toolbar.setBackgroundColor(p.getDarkVibrantColor(getResources().getColor(R.color.colorPrimary)));
+                    appbar.setBackgroundColor(p.getDarkVibrantColor(getResources().getColor(R.color.colorPrimary)));
+                } else {
+                    toolbar.setBackgroundColor(p.getVibrantColor(getResources().getColor(R.color.colorPrimary)));
+                    appbar.setBackgroundColor(p.getVibrantColor(getResources().getColor(R.color.colorPrimary)));
+                }
 
 
                 Picasso.with(getApplicationContext()).load(account.getCoverPhotoURL()).into(backdrop);
-
 
             }
         });

@@ -1,5 +1,6 @@
 package itt.matthew.houseshare.Models;
 
+import android.graphics.Color;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
@@ -42,13 +43,24 @@ public class House implements Parcelable {
         }
     }
 
+    public House (House toSet){
+
+        this.setID(toSet.getID());
+        this.name = toSet.getName();
+        this.description = toSet.getDescription();
+        this.HouseID = toSet.getHouseID();
+        setCosts(toSet.getCost());
+        setMembers(toSet.getMembers());
+        setCostCategories(toSet.getCostCategory());
+    }
+
 
     private void setUpCostCategories(){
 
-        CostCategory Rent = new CostCategory("Rent", -65536);
-        CostCategory Internet = new CostCategory("Internet", -16776961);
-        CostCategory Gas = new CostCategory("Gas", -7829368);
-        CostCategory Electricity = new CostCategory("Electricity", -256);
+        CostCategory Rent = new CostCategory("Rent", Color.rgb(26, 63, 28));
+        CostCategory Internet = new CostCategory("Internet", Color.rgb(11, 91, 71));
+        CostCategory Gas = new CostCategory("Gas", Color.rgb(49, 30, 100));
+        CostCategory Electricity = new CostCategory("Electricity", Color.rgb(100, 9, 27));
 
         ArrayList<CostCategory> categories = new ArrayList<CostCategory>();
         categories.add(Rent);
@@ -70,7 +82,13 @@ public class House implements Parcelable {
         readFromParcel(in);
     }
 
+    public String getID() {
+        return ID;
+    }
 
+    public void setID(String ID) {
+        this.ID = ID;
+    }
 
     public String getName() {
         return name;
@@ -91,7 +109,7 @@ public class House implements Parcelable {
 
     public int getHouseID() { return HouseID; }
 
-    public void setID(int HouseID) {this.HouseID = HouseID; }
+    public void setHouseID(int HouseID) {this.HouseID = HouseID; }
 
 
     public ArrayList<Account> getMembers() { return getMembersFromJSON();}

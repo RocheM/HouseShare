@@ -122,6 +122,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             FacebookSdk.sdkInitialize(this);
         }
 
+        setupData();
         setupAzure();
         setContentView(R.layout.activity_main);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
@@ -148,6 +149,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         setupAccount();
         loadSelection(0);
+    }
+
+    private void setupData(){
+
+        Bundle b = getIntent().getBundleExtra("Bundle");
+        current = b.getParcelable("Account");
+        house = b.getParcelable("House");
+
     }
 
     private void setupAccount(){
@@ -300,8 +309,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                          @Override
                                          public void onCompleted(List<House> result, int count, Exception exception, ServiceFilterResponse response) {
                                              if (exception == null) {
-                                                 house = result.get(0);
-
+                                                 house = new House(result.get(0));
                                              } else
                                                  exception.printStackTrace();
                                          }

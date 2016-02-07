@@ -18,7 +18,7 @@ public class Account implements Parcelable {
     private String location;
     private String about;
     private String coverPhotoURL;
-    private int houseID;
+    private int houseID = -1;
 
     public Account(String facebookID, String name, String birthday, String location, String about, String coverPhotoURL){
 

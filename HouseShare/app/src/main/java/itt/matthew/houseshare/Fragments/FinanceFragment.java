@@ -151,13 +151,7 @@ public class FinanceFragment extends Fragment {
 
         mRecyclerView.setAdapter(adapter);
         mRecyclerView.setClickable(true);
-        mRecyclerView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-               int pos = mRecyclerView.getChildAdapterPosition(v);
-                Toast.makeText(getContext(), "You selected " + current_house.getCost().get(pos).getCategory().getName(), Toast.LENGTH_SHORT).show();
-            }
-        });
+
 
 
 

@@ -225,14 +225,21 @@ public class FBLoginFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_fblogin, container, false);
     }
 
-    public void startJoinHouseActivity(){
+    public void startJoinHouseActivity(Account acc){
         Intent i = new Intent(getActivity(), JoinHouse.class);
+        Bundle b = new Bundle();
+        b.putParcelable("Account", acc);
+        i.putExtra("Bundle", b);
+
         startActivity(i);
     }
 
-    public void startMainActivity() {
+    public void startMainActivity(Account acc) {
 
         Intent i = new Intent(getActivity(), MainActivity.class);
+        Bundle b = new Bundle();
+        b.putParcelable("Account", acc);
+        i.putExtra("Bundle", b);
         startActivity(i);
 
     }
@@ -348,12 +355,12 @@ public class FBLoginFragment extends Fragment {
                         } else {
                             newAccount = result.get(0);
 
-                            if (newAccount.getHouseID() == 0) {
+                            if (newAccount.getHouseID() == -1) {
                                 progress.hide();
-                                startJoinHouseActivity();
+                                startJoinHouseActivity(newAccount);
                             } else
                                 progress.hide();
-                            startMainActivity();
+                            startMainActivity(newAccount);
                         }
                     } else {
                         exception.printStackTrace();
@@ -452,7 +459,7 @@ public class FBLoginFragment extends Fragment {
                 if (exception == null) {
 
                     progress.hide();
-                    startJoinHouseActivity();
+                    startJoinHouseActivity(newAccount);
 
                 } else {
                     exception.printStackTrace();

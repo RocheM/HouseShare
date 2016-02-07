@@ -7,8 +7,15 @@ import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -17,6 +24,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,71 +43,48 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
+import itt.matthew.houseshare.Fragments.CostSplitFragment;
+import itt.matthew.houseshare.Fragments.CreateCostFragment;
+import itt.matthew.houseshare.Fragments.TasksFragment;
 import itt.matthew.houseshare.Models.Account;
 import itt.matthew.houseshare.Models.Cost;
 import itt.matthew.houseshare.Models.CostCategory;
+import itt.matthew.houseshare.Models.CostSplit;
 import itt.matthew.houseshare.Models.House;
 import itt.matthew.houseshare.Models.Interval;
 import itt.matthew.houseshare.R;
 
-public class NewCost extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
-
-
-    private Account current;
-    private House house;
-
-
-    private ArrayList<String> CategoryStrings = new ArrayList<String>();
-    private ArrayAdapter<String> categoryAdapter;
+public class NewCost extends AppCompatActivity {
 
 
     private MobileServiceClient mClient;
     private MobileServiceTable<Account> mAccountTable;
     private MobileServiceTable<House> mHouseTable;
 
-    private Spinner intervalSpinner, numberSpinner, category;
-    private Button startDateButton, endDateButton;
-    private TextView startEdit, endEdit;
-    private EditText amount;
+
+    private Account current;
+    private House house;
+    private Cost newCost;
+    private CostSplit newCostSplit;
+
+    private ArrayList<String> CategoryStrings = new ArrayList<String>();
+    private ArrayAdapter<String> categoryAdapter;
+
+    private Spinner category;
     private FloatingActionButton fab;
     private MaterialDialog dialog;
-    private char dateField;
     private int categorySelectedColor;
-    private Calendar startDateSelected = new GregorianCalendar();
-    private Calendar endDateSelected = new GregorianCalendar();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_cost);
 
-        setupAzure();
         setupData();
         setupUI();
     }
 
 
-    public void setupAzure() {
-
-
-        try {
-            mClient = new MobileServiceClient(
-                    "https://backendhs.azurewebsites.net",
-                    this
-            );
-
-        } catch (Exception e) {
-            new MaterialDialog.Builder(this)
-                    .title("Error")
-                    .content(e.getMessage())
-                    .positiveText("Ok")
-                    .show();
-
-        }
-
-        mAccountTable = mClient.getTable(Account.class);
-        mHouseTable = mClient.getTable(House.class);
-    }
 
 
     @Override
@@ -108,23 +93,6 @@ public class NewCost extends AppCompatActivity implements DatePickerDialog.OnDat
 
         inflater.inflate(R.menu.cost_menu, menu);
         return super.onCreateOptionsMenu(menu);
-    }
-
-
-    private int setUpInterval(int index) {
-
-        switch (index) {
-            case 0:
-                return 1;
-            case 1:
-                return 7;
-            case 2:
-                return 30;
-            case 3:
-                return 365;
-        }
-
-        return 0;
     }
 
 
@@ -157,8 +125,10 @@ public class NewCost extends AppCompatActivity implements DatePickerDialog.OnDat
     }
 
     private void changeBackgroundColor(int color) {
-        CollapsingToolbarLayout background = (CollapsingToolbarLayout) findViewById(R.id.cost_collapsing);
+        LinearLayout background = (LinearLayout) findViewById(R.id.cost_title_container);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.cost_toolbar);
         background.setBackgroundColor(color);
+        toolbar.setBackgroundColor(color);
     }
 
 
@@ -173,53 +143,28 @@ public class NewCost extends AppCompatActivity implements DatePickerDialog.OnDat
 
 
         android.support.v7.widget.Toolbar toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.cost_toolbar);
+        ViewPager viewPager  = (ViewPager) findViewById(R.id.cost_viewpager);
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.costs_tabs);
+
+
+        viewPager.setAdapter(new TabsAdapter(getSupportFragmentManager()));
+        tabLayout.setupWithViewPager(viewPager);
+
 
         setSupportActionBar(toolbar);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_keyboard_backspace_24dp);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayUseLogoEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        intervalSpinner = (Spinner) findViewById(R.id.IntervalSpinnerUI);
-        numberSpinner = (Spinner) findViewById(R.id.numberSpinner);
-        startDateButton = (Button) findViewById(R.id.startDateButton);
-        endDateButton = (Button) findViewById(R.id.endDateButton);
-        startEdit = (TextView) findViewById(R.id.startDate);
-        endEdit = (TextView) findViewById(R.id.endDate);
+
+
         category = (Spinner) findViewById(R.id.CategorySpinner);
-        amount = (EditText) findViewById(R.id.Amount);
         fab = (FloatingActionButton) findViewById(R.id.cost_fab);
 
-        startDateButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        fab.setImageResource(R.drawable.ic_add_24dp);
 
-                dateField = 's';
-                Calendar now = Calendar.getInstance();
-                DatePickerDialog dpd = DatePickerDialog.newInstance(
-                        NewCost.this,
-                        now.get(Calendar.YEAR),
-                        now.get(Calendar.MONTH),
-                        now.get(Calendar.DAY_OF_MONTH)
-                );
-                dpd.show(getFragmentManager(), "Pick Start Date");
-            }
-        });
-
-        endDateButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                dateField = 'e';
-                Calendar now = Calendar.getInstance();
-                DatePickerDialog dpd = DatePickerDialog.newInstance(
-                        NewCost.this,
-                        now.get(Calendar.YEAR),
-                        now.get(Calendar.MONTH),
-                        now.get(Calendar.DAY_OF_MONTH)
-                );
-                dpd.show(getFragmentManager(), "Pick Start Date");
-            }
-        });
 
         boolean wrapInScrollView = true;
         final MaterialDialog.Builder builder = new MaterialDialog.Builder(this)
@@ -230,27 +175,11 @@ public class NewCost extends AppCompatActivity implements DatePickerDialog.OnDat
                 .autoDismiss(false);
 
 
-        ArrayList<String> strings = new ArrayList<String>();
-        ArrayList<Integer> ints = new ArrayList<Integer>();
-
-        for (int i = 1; i <= 10; i++)
-            ints.add(i);
-
-
-        Interval[] test = Interval.values();
-        for (int i = 0; i < test.length; i++) {
-            strings.add(test[i].toString() + "(s)");
-        }
-
-        intervalSpinner.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_item, strings));
 
 
         for (int i = 0; i < house.getCostCategory().size(); i++) {
             CategoryStrings.add(i, house.getCostCategory().get(i).getName());
         }
-
-
-        numberSpinner.setAdapter(new ArrayAdapter<>(this, R.layout.spinner_item, ints.toArray()));
 
         categoryAdapter = new ArrayAdapter<String>(this, R.layout.spinner_item_title, CategoryStrings);
         category.setAdapter(categoryAdapter);
@@ -320,18 +249,6 @@ public class NewCost extends AppCompatActivity implements DatePickerDialog.OnDat
                     }
                 });
 
-                ArrayList<String> strings = new ArrayList<String>();
-                ArrayList<Integer> ints = new ArrayList<Integer>();
-                for (int i = 1; i <= 10; i++)
-                    ints.add(i);
-
-
-                Interval[] test = Interval.values();
-                for (int i = 0; i < test.length; i++) {
-                    strings.add(test[i].toString() + "(s)");
-                }
-
-
             }
         });
 
@@ -363,30 +280,6 @@ public class NewCost extends AppCompatActivity implements DatePickerDialog.OnDat
         return super.onOptionsItemSelected(item);
     }
 
-    private void CreateNewCost() {
-
-        CostCategory newCostCategory = house.getCostCategory().get(category.getSelectedItemPosition());
-
-        Double newCostAmount = 0.0;
-        newCostAmount = Double.parseDouble(amount.getText().toString());
-
-
-        Calendar newCostStartDate = startDateSelected;
-
-        newCostStartDate = startDateSelected;
-
-        Calendar newCostEndDate = endDateSelected;
-        newCostEndDate = endDateSelected;
-
-        int newCostDays = (Integer)numberSpinner.getSelectedItem() * setUpInterval(intervalSpinner.getSelectedItemPosition());
-
-
-        Cost newCost = new Cost(newCostDays, newCostCategory, newCostAmount, newCostStartDate, newCostEndDate);
-        ArrayList<Cost> toSet = house.getCost();
-        toSet.add(newCost);
-        house.setCosts(toSet);
-        updateItem(house);
-    }
 
     private void updateItem(final House item) {
         if (mClient == null) {
@@ -409,12 +302,12 @@ public class NewCost extends AppCompatActivity implements DatePickerDialog.OnDat
                     mHouseTable.update(item).get();
                     runOnUiThread(new Runnable() {
                         public void run() {
-                            progress.hide();
                             finish();
                         }
                     });
                 } catch (Exception exception) {
-                    progress.hide();
+
+                    exception.printStackTrace();
                 }
                 return null;
             }
@@ -432,17 +325,40 @@ public class NewCost extends AppCompatActivity implements DatePickerDialog.OnDat
         super.onStop();
     }
 
+    class TabsAdapter extends FragmentPagerAdapter {
+        public TabsAdapter(FragmentManager fm) {
+            super(fm);
+        }
 
-    @Override
-    public void onDateSet(DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
+        @Override
+        public int getCount() {
+            return 2;
+        }
 
-        if (dateField == 's') {
-            startEdit.setText(Integer.toString(year) + "/" + Integer.toString(monthOfYear + 1) + "/" + Integer.toString(dayOfMonth));
-            startDateSelected.set(year, monthOfYear, dayOfMonth);
-        } else {
-            endEdit.setText(Integer.toString(year) + "/" + Integer.toString(monthOfYear + 1) + "/" + Integer.toString(dayOfMonth));
-            startDateSelected.set(year, monthOfYear, dayOfMonth);
+        @Override
+        public Fragment getItem(int i) {
+            switch(i) {
+                case 0: return CreateCostFragment.newInstance("Test", "Test");
+                case 1: return CostSplitFragment.newInstance("Test", "Test");
+            }
+            return null;
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            switch(position) {
+                case 0: return "Cost Details";
+                case 1: return "Cost Split";
+            }
+            return "";
         }
     }
+
+
+    private void CreateNewCost(){
+
+    }
+
+
 }
 
