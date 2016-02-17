@@ -7,7 +7,7 @@
 
     <item android:id="@+id/submit"
         android:icon="@drawable/ic_done_24dp"
-        android:title="Submit"
+        android:title="@string/submit"
         app:showAsAction="ifRoom" />
 
 

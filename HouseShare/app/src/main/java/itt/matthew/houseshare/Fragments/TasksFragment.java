@@ -8,8 +8,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import de.greenrobot.event.EventBus;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+
 import itt.matthew.houseshare.Events.MessageEvent;
+import itt.matthew.houseshare.Events.UpdateAccountEvent;
+import itt.matthew.houseshare.Models.Account;
+import itt.matthew.houseshare.Models.House;
 import itt.matthew.houseshare.R;
 
 public class TasksFragment extends Fragment  {
@@ -21,20 +26,22 @@ public class TasksFragment extends Fragment  {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    private House house;
+    private Account current;
 
     public TasksFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment TasksFragment.
-     */
-    // TODO: Rename and change types and number of parameters
+
+
+    @Subscribe
+    public void onUpdateAccountEvent(UpdateAccountEvent event){
+        current = event.getAccount();
+        house = event.getHouse();
+    }
+
+
     public static TasksFragment newInstance(String param1, String param2) {
         TasksFragment fragment = new TasksFragment();
         Bundle args = new Bundle();

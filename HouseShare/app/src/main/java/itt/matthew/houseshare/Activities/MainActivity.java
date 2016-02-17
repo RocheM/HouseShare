@@ -28,11 +28,14 @@ import com.microsoft.windowsazure.mobileservices.http.ServiceFilterResponse;
 import com.microsoft.windowsazure.mobileservices.table.MobileServiceTable;
 import com.microsoft.windowsazure.mobileservices.table.TableQueryCallback;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import de.greenrobot.event.*;
 import itt.matthew.houseshare.Events.RequestDetailsEvent;
+import itt.matthew.houseshare.Events.UpdateAccountEvent;
 import itt.matthew.houseshare.Fragments.DetailsFragment;
 import itt.matthew.houseshare.Fragments.FinanceFragment;
 import itt.matthew.houseshare.Fragments.TasksFragment;
@@ -60,14 +63,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     protected void onStart() {
         super.onStart();
-
-        EventBus.getDefault().register(this);
+        org.greenrobot.eventbus.EventBus.getDefault().register(this);
     }
 
     @Override
     public void onStop() {
-        EventBus.getDefault().unregister(this);
         super.onStop();
+        org.greenrobot.eventbus.EventBus.getDefault().unregister(this);
     }
 
     public void onResume(){
@@ -85,6 +87,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
 
+    @Subscribe
+    public void onUpdateAccountEvent(UpdateAccountEvent event){
+        current = event.getAccount();
+        house = event.getHouse();
+    }
+
+    @Subscribe
     public void onEvent(AccountEvent event){
         Bundle bundle = new Bundle();
         bundle.putParcelable("account", event.account);
@@ -95,6 +104,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
 
+
+    @Subscribe
     public void onEvent(RequestDetailsEvent event){
         if (event.getRequestFlag() == 'h') {
 
@@ -105,7 +116,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             startCostActivity(bundle);
         }
         else if (event.getRequestFlag() == 'f')
-            EventBus.getDefault().post(new ReplyEvent(house, current));
+            org.greenrobot.eventbus.EventBus.getDefault().post(new ReplyEvent(house, current));
 
     }
 
@@ -310,6 +321,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                          public void onCompleted(List<House> result, int count, Exception exception, ServiceFilterResponse response) {
                                              if (exception == null) {
                                                  house = new House(result.get(0));
+                                                 EventBus.getDefault().post(new UpdateAccountEvent(current, house));
                                              } else
                                                  exception.printStackTrace();
                                          }

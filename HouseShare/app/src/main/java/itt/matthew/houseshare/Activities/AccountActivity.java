@@ -19,11 +19,14 @@ import android.util.AttributeSet;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.afollestad.materialdialogs.color.ColorChooserDialog;
 import com.facebook.AccessToken;
 import com.facebook.FacebookActivity;
 import com.facebook.GraphRequest;
@@ -34,7 +37,9 @@ import com.squareup.picasso.Target;
 import org.json.JSONObject;
 
 import itt.matthew.houseshare.Fragments.FinanceFragment;
+import itt.matthew.houseshare.Fragments.PersonalCostsFragment;
 import itt.matthew.houseshare.Fragments.TasksFragment;
+import itt.matthew.houseshare.Fragments.color_dialog;
 import itt.matthew.houseshare.Models.Account;
 import itt.matthew.houseshare.Models.House;
 import itt.matthew.houseshare.R;
@@ -44,7 +49,7 @@ import jp.wasabeef.picasso.transformations.CropCircleTransformation;
 import jp.wasabeef.picasso.transformations.gpu.KuwaharaFilterTransformation;
 import jp.wasabeef.picasso.transformations.gpu.VignetteFilterTransformation;
 
-public class AccountActivity extends AppCompatActivity implements AppBarLayout.OnOffsetChangedListener {
+public class AccountActivity extends AppCompatActivity implements AppBarLayout.OnOffsetChangedListener{
 
     private Account account;
     private House house;
@@ -59,6 +64,7 @@ public class AccountActivity extends AppCompatActivity implements AppBarLayout.O
     private static final int PERCENTAGE_TO_ANIMATE_AVATAR = 20;
     private boolean mIsAvatarShown = true;
     private Target loadtarget;
+    private Window window;
 
 
 
@@ -91,6 +97,7 @@ public class AccountActivity extends AppCompatActivity implements AppBarLayout.O
     }
 
 
+
     private void setupData() {
         Bundle extras = this.getIntent().getBundleExtra("extra");
         account = extras.getParcelable("account");
@@ -98,6 +105,8 @@ public class AccountActivity extends AppCompatActivity implements AppBarLayout.O
     }
 
     private void setupUI() {
+
+
         backdrop = (ImageView) findViewById(R.id.profile_backdrop);
         profile = (ImageView) findViewById(R.id.profile_image);
         toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.toolbar);
@@ -168,21 +177,31 @@ public class AccountActivity extends AppCompatActivity implements AppBarLayout.O
 
 
 
+
+        window = this.getWindow();
+
         Palette.from(b).generate(new Palette.PaletteAsyncListener() {
             public void onGenerated(Palette p) {
+
+                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+
 
                 if (p.getDarkVibrantColor(getResources().getColor(R.color.colorPrimary)) == getResources().getColor(R.color.colorPrimary)) {
 
                     toolbar.setBackgroundColor(p.getMutedColor(getResources().getColor(R.color.colorPrimary)));
                     appbar.setBackgroundColor(p.getMutedColor(getResources().getColor(R.color.colorPrimary)));
+                    window.setStatusBarColor(darker(p.getMutedColor(getResources().getColor(R.color.colorPrimary))));
 
 
                 } else if (p.getMutedColor(getResources().getColor(R.color.colorPrimary)) == getResources().getColor(R.color.colorPrimary)) {
                     toolbar.setBackgroundColor(p.getDarkVibrantColor(getResources().getColor(R.color.colorPrimary)));
                     appbar.setBackgroundColor(p.getDarkVibrantColor(getResources().getColor(R.color.colorPrimary)));
+                    window.setStatusBarColor(darker(p.getMutedColor(getResources().getColor(R.color.colorPrimary))));
                 } else {
                     toolbar.setBackgroundColor(p.getVibrantColor(getResources().getColor(R.color.colorPrimary)));
                     appbar.setBackgroundColor(p.getVibrantColor(getResources().getColor(R.color.colorPrimary)));
+                    window.setStatusBarColor(darker(p.getMutedColor(getResources().getColor(R.color.colorPrimary))));
                 }
 
 
@@ -191,6 +210,15 @@ public class AccountActivity extends AppCompatActivity implements AppBarLayout.O
             }
         });
 
+    }
+
+
+    public static int darker (int color) {
+        float[] hsv = new float[3];
+        Color.colorToHSV(color, hsv);
+        hsv[2] = 1.0f - 0.8f * (1.0f - hsv[2]);
+        color = Color.HSVToColor(hsv);
+        return color;
     }
 
     class TabsAdapter extends FragmentPagerAdapter {
@@ -206,8 +234,9 @@ public class AccountActivity extends AppCompatActivity implements AppBarLayout.O
         @Override
         public Fragment getItem(int i) {
             switch(i) {
-                case 0: return TasksFragment.newInstance("Test", "Test");
-                case 1: return TasksFragment.newInstance("Test", "Test");
+                case 0: return PersonalCostsFragment.newInstance("Test", "Test");
+                case 1: return color_dialog.newInstance("Test", "Test");
+
             }
             return null;
         }

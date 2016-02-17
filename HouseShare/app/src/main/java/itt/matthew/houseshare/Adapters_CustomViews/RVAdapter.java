@@ -1,7 +1,10 @@
 package itt.matthew.houseshare.Adapters_CustomViews;
 
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.Icon;
+import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -18,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
 
+import itt.matthew.houseshare.Activities.CostDetails;
 import itt.matthew.houseshare.Models.Cost;
 import itt.matthew.houseshare.Models.House;
 import itt.matthew.houseshare.R;
@@ -29,13 +33,14 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.PersonViewHolder> 
     private RecyclerView recyclerView;
 
     public static class PersonViewHolder extends RecyclerView.ViewHolder {
-        CardView cv;
-        TextView CostCategory;
-        TextView CostDate;
-        TextView CostInterval;
-        TextView CostAmount;
-        ImageView CostColor;
-        Cost currentItem;
+        private CardView cv;
+        private TextView CostCategory;
+        private TextView CostDate;
+        private TextView CostInterval;
+        private TextView CostAmount;
+        private ImageView CostColor;
+        private int currentItem;
+        private House house;
 
 
         PersonViewHolder(View itemView) {
@@ -51,15 +56,21 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.PersonViewHolder> 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Toast.makeText(v.getContext(), currentItem.getCategory().getName(), Toast.LENGTH_LONG).show();
 
+                    Intent i = new Intent(v.getContext(), CostDetails.class);
+                    Bundle b = new Bundle();
+                    b.putParcelable("house", house);
+                    b.putInt("cost", currentItem);
+                    i.putExtra("extra", b);
+                    v.getContext().startActivity(i);
                 }
             });
         }
     }
 
     public RVAdapter(House persons){
-        this.persons = persons;
+        this.persons = new House(persons);
+
     }
 
 
@@ -67,6 +78,7 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.PersonViewHolder> 
     public int getItemCount() {
         return persons.getCost().size();
     }
+
 
     @Override
     public PersonViewHolder onCreateViewHolder(final ViewGroup viewGroup, int i) {
@@ -79,8 +91,9 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.PersonViewHolder> 
     public void onBindViewHolder(PersonViewHolder personViewHolder, int i) {
 
         ArrayList<Cost> costs = persons.getCost();
-
+        personViewHolder.house = new House(persons);
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MMM/yyyy");
+
 
 
 
@@ -90,9 +103,9 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.PersonViewHolder> 
         personViewHolder.CostInterval.setText(Integer.toString(costs.get(i).getInterval()));
         personViewHolder.CostAmount.setText(Double.toString(costs.get(i).getAmount()));
         personViewHolder.CostColor.setBackgroundColor(costs.get(i).getCategory().getColor());
-//        personViewHolder.CostColor.setImageResource(R.drawable.ic_person_24dp);
 
-        personViewHolder.currentItem = costs.get(i);
+
+        personViewHolder.currentItem = i;
 
     }
 

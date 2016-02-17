@@ -5,16 +5,16 @@
     <item
         android:icon="@drawable/ic_more_vert_24dp"
         app:showAsAction="ifRoom"
-        android:title="Setting">
+        android:title="@string/settings">
         <menu>
             <item
                 android:icon="@drawable/ic_person_24dp"
                 android:id="@+id/Account_Setting"
-                android:title="Account Settings" />
+                android:title="@string/account_settings" />
             <item
                 android:icon="@drawable/ic_home_24dp"
                 android:id="@+id/House_Setting"
-                android:title="House Setting" />
+                android:title="@string/house_settings" />
         </menu>
     </item>
 

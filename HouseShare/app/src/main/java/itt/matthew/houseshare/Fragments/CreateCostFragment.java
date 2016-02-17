@@ -8,6 +8,8 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,25 +18,33 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.flask.colorpicker.ColorPickerView;
-import com.flask.colorpicker.OnColorSelectedListener;
-import com.flask.colorpicker.builder.ColorPickerClickListener;
-import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 import com.microsoft.windowsazure.mobileservices.MobileServiceClient;
 import com.microsoft.windowsazure.mobileservices.table.MobileServiceTable;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.logging.SimpleFormatter;
 
 import itt.matthew.houseshare.Activities.NewCost;
+import itt.matthew.houseshare.Events.CostEvent;
 import itt.matthew.houseshare.Models.Account;
+import itt.matthew.houseshare.Models.Cost;
 import itt.matthew.houseshare.Models.CostCategory;
+import itt.matthew.houseshare.Models.CostSplit;
 import itt.matthew.houseshare.Models.House;
 import itt.matthew.houseshare.Models.Interval;
 import itt.matthew.houseshare.R;
@@ -47,9 +57,11 @@ public class CreateCostFragment extends Fragment {
 
     private House house;
     private Account account;
+    private Cost WorkingCost = new Cost();
 
     private ArrayList<String> CategoryStrings = new ArrayList<String>();
     private Spinner intervalSpinner, numberSpinner;
+    private int interval = 1, intervalNumber = 1;
     private Button startDateButton, endDateButton;
     private TextView startEdit, endEdit;
     private EditText amount;
@@ -58,6 +70,8 @@ public class CreateCostFragment extends Fragment {
     private int categorySelectedColor;
     private Calendar startDateSelected = new GregorianCalendar();
     private Calendar endDateSelected = new GregorianCalendar();
+    private DatePickerDialog startDPD, endDPD;
+    boolean error = false;
 
     private static final String ARG_PARAM2 = "param2";
 
@@ -88,71 +102,175 @@ public class CreateCostFragment extends Fragment {
     }
 
 
-    private void buildColor() {
-        ColorPickerDialogBuilder
-                .with(this.getContext())
-                .setTitle("Choose color")
-                .initialColor(R.color.mdtp_red)
-                .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
-                .density(12)
-                .setOnColorSelectedListener(new OnColorSelectedListener() {
-                    @Override
-                    public void onColorSelected(int selectedColor) {
-                        categorySelectedColor = selectedColor;
-                    }
-                })
-                .setPositiveButton("ok", new ColorPickerClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int selectedColor, Integer[] allColors) {
-                        categorySelectedColor = selectedColor;
-                    }
-                })
-                .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                    }
-                })
-                .build()
-                .show();
-    }
-
-
     private void setupData() {
         Bundle extras = this.getActivity().getIntent().getBundleExtra("extra");
         account = extras.getParcelable("account");
         house = extras.getParcelable("house");
+
+        WorkingCost.setAmount(0);
+        ArrayList<CostSplit> newCostSplit = new ArrayList<>();
+        for(int i = 0; i < house.getMembers().size(); i++){
+            CostSplit temp = new CostSplit(house.getMembers().get(i).getFacebookID(), 0);
+            newCostSplit.add(temp);
+        }
+        WorkingCost.setSplit(newCostSplit);
+
+
+
+
+        if (house.getCost() != null) {
+            WorkingCost.setCostID(house.getCost().size() + 1);
+            EventBus.getDefault().post(new CostEvent(WorkingCost));
+        }
+        else {
+            WorkingCost.setCostID(0);
+            EventBus.getDefault().post(new CostEvent(WorkingCost));
+        }
+        WorkingCost.setInterval(1);
+        EventBus.getDefault().post(new CostEvent(WorkingCost));
+
     }
 
+
+    @Subscribe
+    public void onCostEvent(CostEvent costEvent){
+        WorkingCost = costEvent.getCost();
+    }
+
+
+    private int generateInterval(int i){
+
+        switch (i) {
+            case 0:
+                return 1;
+            case 1:
+                return 7;
+            case 2:
+                return 30;
+            case 3:
+                return 365;
+        }
+        return 1;
+    }
 
     private void setupUI() {
 
 
         intervalSpinner = (Spinner) getView().findViewById(R.id.IntervalSpinnerUI);
+        intervalSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                interval = generateInterval(position);
+                WorkingCost.setInterval(intervalNumber * interval);
+                EventBus.getDefault().post(new CostEvent(WorkingCost));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                interval = 1;
+                WorkingCost.setInterval(1);
+                EventBus.getDefault().post(new CostEvent(WorkingCost));
+            }
+        });
+
         numberSpinner = (Spinner) getView().findViewById(R.id.numberSpinner);
+        numberSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                intervalNumber = position + 1;
+                WorkingCost.setInterval(interval * intervalNumber);
+                EventBus.getDefault().post(new CostEvent(WorkingCost));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                intervalNumber = 1;
+                WorkingCost.setInterval(interval);
+                EventBus.getDefault().post(new CostEvent(WorkingCost));
+            }
+        });
+
+
+
         startDateButton = (Button) getView().findViewById(R.id.startDateButton);
         endDateButton = (Button) getView().findViewById(R.id.endDateButton);
         startEdit = (TextView) getView().findViewById(R.id.startDate);
         endEdit = (TextView) getView().findViewById(R.id.endDate);
+
+
         amount = (EditText) getView().findViewById(R.id.Amount);
+        amount.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                try {
+                    if (Double.parseDouble(s.toString()) < 0 || Double.parseDouble(s.toString()) == 0) {
+                        amount.setError("Amount Cannot be negative or Zero");
+                        Toast.makeText(getContext(), "Amount Cannot be negative or Zero", Toast.LENGTH_SHORT).show();
+                        error = true;
+                    } else {
+                        WorkingCost.setAmount(Double.parseDouble(s.toString()));
+                        ArrayList<CostSplit> costSplits = new ArrayList<CostSplit>();
+                        double divide = WorkingCost.getAmount() / house.getMembers().size();
+                        for (int i = 0; i < house.getMembers().size(); i++){
+                            CostSplit split = new CostSplit(house.getMembers().get(i).getFacebookID(), divide);
+                            costSplits.add(split);
+                        }
+                        WorkingCost.setSplit(costSplits);
+
+                        error = false;
+                        EventBus.getDefault().post(new CostEvent(WorkingCost));
+                    }
+                } catch (NumberFormatException ex){
+                    ex.printStackTrace();
+                }
+            }
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
 
         startDateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                dateField = 's';
                 Calendar now = Calendar.getInstance();
-                DatePickerDialog dpd = DatePickerDialog.newInstance(
+                startDPD = DatePickerDialog.newInstance(
                         new DatePickerDialog.OnDateSetListener() {
                             @Override
                             public void onDateSet(DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
-
+                                GregorianCalendar cal = new GregorianCalendar();
+                                cal.set(year, monthOfYear, dayOfMonth);
+                                if (cal.getTimeInMillis() < Calendar.getInstance().getTimeInMillis())
+                                {
+                                    startEdit.setError("Start Date Cannot be before current Date");
+                                    startEdit.setText("Choose Start Date");
+                                    Toast.makeText(getContext(), "Start Date Cannot be before current Date", Toast.LENGTH_SHORT).show();
+                                    error = true;
+                                }
+                                else {
+                                    startEdit.setError(null);
+                                    DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+                                    String date = formatter.format(cal.getTime());
+                                    startEdit.setText(date);
+                                    startDateSelected = cal;
+                                    WorkingCost.setStartDate(startDateSelected);
+                                    error = false;
+                                    EventBus.getDefault().post(new CostEvent(WorkingCost));
+                                }
                             }
                         },
                         now.get(Calendar.YEAR),
                         now.get(Calendar.MONTH),
                         now.get(Calendar.DAY_OF_MONTH)
                 );
-                dpd.show(getActivity().getFragmentManager(), "Pick Start Date");
+                startDPD.show(getActivity().getFragmentManager(), "Pick Start Date");
             }
         });
 
@@ -160,20 +278,44 @@ public class CreateCostFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
-                dateField = 'e';
+
                 Calendar now = Calendar.getInstance();
-                DatePickerDialog dpd = DatePickerDialog.newInstance(
+                endDPD = DatePickerDialog.newInstance(
                         new DatePickerDialog.OnDateSetListener() {
                             @Override
                             public void onDateSet(DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
+                                GregorianCalendar cal = new GregorianCalendar();
+                                cal.set(year, monthOfYear, dayOfMonth);
+                                if (cal.getTimeInMillis() <= startDateSelected.getTimeInMillis() || cal.getTimeInMillis() <= GregorianCalendar.getInstance().getTimeInMillis())
+                                {
+                                    endEdit.setError("End Date Cannot be on or  before Start Date");
+                                    endEdit.setText("Optional End Date");
+                                    if (cal.getTimeInMillis() <= startDateSelected.getTimeInMillis()) {
+                                        Toast.makeText(getContext(), "End Date Cannot be on or before Start Date", Toast.LENGTH_SHORT).show();
+                                    }
+                                    else
+                                        Toast.makeText(getContext(), "End Date Cannot be before current Date", Toast.LENGTH_SHORT).show();
 
+                                    error = true;
+                                }
+                                else {
+
+                                    DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+                                    String date = formatter.format(cal.getTime());
+                                    endEdit.setError(null);
+                                    endEdit.setText(date);
+                                    endDateSelected = cal;
+                                    WorkingCost.setEndDate(cal);
+                                    error = false;
+                                    EventBus.getDefault().post(new CostEvent(WorkingCost));
+                                }
                             }
                         },
                         now.get(Calendar.YEAR),
                         now.get(Calendar.MONTH),
                         now.get(Calendar.DAY_OF_MONTH)
                 );
-                dpd.show(getActivity().getFragmentManager(), "Pick Start Date");
+                endDPD.show(getActivity().getFragmentManager(), "Pick Start Date");
             }
         });
 
@@ -203,7 +345,6 @@ public class CreateCostFragment extends Fragment {
     }
 
 
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -229,6 +370,18 @@ public class CreateCostFragment extends Fragment {
 
         setupData();
         setupUI();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
     }
 
     // TODO: Rename method, update argument and hook method into UI event

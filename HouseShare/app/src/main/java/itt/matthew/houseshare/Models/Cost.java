@@ -9,6 +9,7 @@ import java.util.Calendar;
 public class Cost {
 
     private int ID;
+    private int CostID;
     private int interval;
     private CostCategory Category;
     private double amount;
@@ -24,6 +25,10 @@ public class Cost {
         this.split = split;
         this.StartDate = StartDate;
         this.EndDate = EndDate;
+    }
+
+
+    public Cost(){
     }
 
     public int getID() {
@@ -80,5 +85,13 @@ public class Cost {
 
     public void setAmount(double amount) {
         this.amount = amount;
+    }
+
+    public void setCostID(int costID) {
+        CostID = costID;
+    }
+
+    public int getCostID() {
+        return CostID;
     }
 }

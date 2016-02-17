@@ -3,9 +3,7 @@ package itt.matthew.houseshare.Events;
 import android.content.Context;
 import android.content.Intent;
 
-import com.google.common.eventbus.EventBus;
 
-import de.greenrobot.event.EventBusBuilder;
 
 /**
  * Created by Matthew on 22/01/2016.

@@ -21,17 +21,20 @@ import com.microsoft.windowsazure.mobileservices.http.ServiceFilterResponse;
 import com.microsoft.windowsazure.mobileservices.table.MobileServiceTable;
 import com.microsoft.windowsazure.mobileservices.table.TableQueryCallback;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import de.greenrobot.event.EventBus;
 import itt.matthew.houseshare.Activities.NewCost;
 import itt.matthew.houseshare.Adapters_CustomViews.RVAdapter;
 import itt.matthew.houseshare.Events.MessageEvent;
 import itt.matthew.houseshare.Events.ReplyEvent;
 import itt.matthew.houseshare.Events.RequestDetailsEvent;
+import itt.matthew.houseshare.Events.UpdateAccountEvent;
 import itt.matthew.houseshare.Models.Account;
 import itt.matthew.houseshare.Models.House;
 import itt.matthew.houseshare.R;
@@ -54,12 +57,10 @@ public class FinanceFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    RVAdapter adapter;
-
+    private RVAdapter adapter;
 
     private MobileServiceClient mClient;
     private android.support.v7.widget.RecyclerView mRecyclerView;
-    private RVAdapter mAdapter;
     private android.support.v7.widget.RecyclerView.LayoutManager mLayoutManager;
 
     private MobileServiceTable<Account> mAccountTable;
@@ -74,15 +75,17 @@ public class FinanceFragment extends Fragment {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment FinanceFragment.
-     */
-    // TODO: Rename and change types and number of parameters
+
+
+
+    @Subscribe
+    public void onUpdateAccountEvent(UpdateAccountEvent event){
+        current_account = event.getAccount();
+        current_house = event.getHouse();
+
+        populateItems();
+    }
+
     public static FinanceFragment newInstance(String param1, String param2) {
         FinanceFragment fragment = new FinanceFragment();
         Bundle args = new Bundle();
@@ -125,6 +128,7 @@ public class FinanceFragment extends Fragment {
     }
 
 
+    @Subscribe
     public void onEvent(ReplyEvent event){
 
         current_account = event.getAccount();
@@ -137,9 +141,6 @@ public class FinanceFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
 
-
-
-
         View rootView = inflater.inflate(R.layout.fragment_finance, container, false);
 
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.rv);
@@ -151,10 +152,6 @@ public class FinanceFragment extends Fragment {
 
         mRecyclerView.setAdapter(adapter);
         mRecyclerView.setClickable(true);
-
-
-
-
 
 
         return rootView;
@@ -200,6 +197,7 @@ public class FinanceFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
+
         populateItems();
     }
 
@@ -244,6 +242,12 @@ public class FinanceFragment extends Fragment {
 
 
     private void populateItems(){
+
+        adapter = new RVAdapter(current_house);
+        mRecyclerView.setAdapter(adapter);
+
+        adapter = new RVAdapter(current_house);
+        mRecyclerView.setAdapter(adapter);
 
     }
 

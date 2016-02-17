@@ -21,10 +21,13 @@ import com.microsoft.windowsazure.mobileservices.http.ServiceFilterResponse;
 import com.microsoft.windowsazure.mobileservices.table.MobileServiceTable;
 import com.microsoft.windowsazure.mobileservices.table.TableQueryCallback;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import de.greenrobot.event.EventBus;
+import itt.matthew.houseshare.Events.UpdateAccountEvent;
 import itt.matthew.houseshare.Models.Account;
 import itt.matthew.houseshare.Events.AccountEvent;
 import itt.matthew.houseshare.Adapters_CustomViews.GridAdapter;
@@ -57,19 +60,6 @@ public class DetailsFragment extends Fragment{
         // Required empty public constructor
     }
 
-
-
-
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment DetailsFragment.
-     */
-    // TODO: Rename and change types and number of parameters
     public static DetailsFragment newInstance(String param1, String param2) {
         DetailsFragment fragment = new DetailsFragment();
         Bundle args = new Bundle();
@@ -91,6 +81,15 @@ public class DetailsFragment extends Fragment{
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
+
+
+
+    @Subscribe
+    public void onUpdateAccountEvent(UpdateAccountEvent event){
+        current = event.getAccount();
+        house = event.getHouse();
+    }
+
 
     @Override
     public void onResume() {
@@ -222,6 +221,7 @@ public class DetailsFragment extends Fragment{
                                          public void onCompleted(List<House> result, int count, Exception exception, ServiceFilterResponse response) {
                                              if (exception == null) {
                                                  house = new House(result.get(0));
+                                                 EventBus.getDefault().post(new UpdateAccountEvent(current, house));
                                                  loadImages();
 
                                              } else

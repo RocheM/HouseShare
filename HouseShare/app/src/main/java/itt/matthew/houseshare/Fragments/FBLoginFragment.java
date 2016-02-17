@@ -173,7 +173,7 @@ public class FBLoginFragment extends Fragment {
 
         }
         mAccountTable = mClient.getTable(Account.class);
-
+        
 
     }
 
