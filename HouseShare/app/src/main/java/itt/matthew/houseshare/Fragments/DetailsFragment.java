@@ -1,6 +1,7 @@
 package itt.matthew.houseshare.Fragments;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -15,8 +16,9 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.facebook.Profile;
+
 import com.microsoft.windowsazure.mobileservices.MobileServiceClient;
+import com.microsoft.windowsazure.mobileservices.authentication.MobileServiceUser;
 import com.microsoft.windowsazure.mobileservices.http.ServiceFilterResponse;
 import com.microsoft.windowsazure.mobileservices.table.MobileServiceTable;
 import com.microsoft.windowsazure.mobileservices.table.TableQueryCallback;
@@ -51,6 +53,14 @@ public class DetailsFragment extends Fragment{
     private GridView gridView;
 
 
+    public static final String SHAREDPREFFILE = "temp";
+    public static final String USERIDPREF = "uid";
+    public static final String TOKENPREF = "tkn";
+    public static final String FBTOKENPREF = "fbt";
+
+
+
+
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
@@ -74,7 +84,14 @@ public class DetailsFragment extends Fragment{
         super.onCreate(savedInstanceState);
 
         setupAzure();
-        lookupAccount(Profile.getCurrentProfile().getId());
+
+        Bundle extra = getActivity().getIntent().getExtras().getBundle("extra");
+        current = extra.getParcelable("account");
+        house = extra.getParcelable("house");
+
+        lookupAccount(current.getFacebookID());
+
+
 
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
@@ -96,7 +113,7 @@ public class DetailsFragment extends Fragment{
         super.onResume();
 
         setupAzure();
-        lookupAccount(Profile.getCurrentProfile().getId());
+        lookupAccount(current.getFacebookID());
         EventBus.getDefault().post(new MessageEvent("My House Mates",  0));
     }
 
@@ -166,8 +183,26 @@ public class DetailsFragment extends Fragment{
 
         }
 
+        loadUserTokenCache(mClient);
         mAccountTable = mClient.getTable(Account.class);
         mHouseTable = mClient.getTable(House.class);
+    }
+
+    private boolean loadUserTokenCache(MobileServiceClient client)
+    {
+        SharedPreferences prefs = getActivity().getSharedPreferences(SHAREDPREFFILE, Context.MODE_PRIVATE);
+        String userId = prefs.getString(USERIDPREF, "undefined");
+        if (userId == "undefined")
+            return false;
+        String token = prefs.getString(TOKENPREF, "undefined");
+        if (token == "undefined")
+            return false;
+
+        MobileServiceUser user = new MobileServiceUser(userId);
+        user.setAuthenticationToken(token);
+        client.setCurrentUser(user);
+
+        return true;
     }
 
 

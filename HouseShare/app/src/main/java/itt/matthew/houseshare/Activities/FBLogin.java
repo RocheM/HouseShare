@@ -13,6 +13,7 @@ public class FBLogin extends AppCompatActivity implements FBLoginFragment.OnFrag
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fblogin);
 
+        getSupportActionBar().setTitle("Welcome");
 
         }
 

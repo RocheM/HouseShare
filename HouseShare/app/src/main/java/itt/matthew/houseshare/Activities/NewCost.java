@@ -2,7 +2,9 @@ package itt.matthew.houseshare.Activities;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
@@ -36,9 +38,9 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.color.ColorChooserDialog;
-import com.facebook.FacebookRequestError;
 import com.google.common.eventbus.EventBus;
 import com.microsoft.windowsazure.mobileservices.MobileServiceClient;
+import com.microsoft.windowsazure.mobileservices.authentication.MobileServiceUser;
 import com.microsoft.windowsazure.mobileservices.table.MobileServiceTable;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 
@@ -90,8 +92,10 @@ public class NewCost extends AppCompatActivity implements ColorChooserDialog.Col
 
 
 
-
-
+    public static final String SHAREDPREFFILE = "temp";
+    public static final String USERIDPREF = "uid";
+    public static final String TOKENPREF = "tkn";
+    public static final String FBTOKENPREF = "fbt";
 
 
     @Override
@@ -124,8 +128,28 @@ public class NewCost extends AppCompatActivity implements ColorChooserDialog.Col
 
         }
 
+        loadUserTokenCache(mClient);
         mAccountTable = mClient.getTable(Account.class);
         mHouseTable = mClient.getTable(House.class);
+    }
+
+
+
+    private boolean loadUserTokenCache(MobileServiceClient client)
+    {
+        SharedPreferences prefs = getSharedPreferences(SHAREDPREFFILE, Context.MODE_PRIVATE);
+        String userId = prefs.getString(USERIDPREF, "undefined");
+        if (userId == "undefined")
+            return false;
+        String token = prefs.getString(TOKENPREF, "undefined");
+        if (token == "undefined")
+            return false;
+
+        MobileServiceUser user = new MobileServiceUser(userId);
+        user.setAuthenticationToken(token);
+        client.setCurrentUser(user);
+
+        return true;
     }
 
 
@@ -179,7 +203,6 @@ public class NewCost extends AppCompatActivity implements ColorChooserDialog.Col
 
     }
 
-
     private void setupUI() {
 
 
@@ -189,7 +212,6 @@ public class NewCost extends AppCompatActivity implements ColorChooserDialog.Col
 
         viewPager.setAdapter(new TabsAdapter(getSupportFragmentManager()));
         tabLayout.setupWithViewPager(viewPager);
-
 
 
         setSupportActionBar(toolbar);
@@ -333,6 +355,7 @@ public class NewCost extends AppCompatActivity implements ColorChooserDialog.Col
                 colorPreviewText.setText("Selected Color");
 
 
+
             }
         });
 
@@ -450,12 +473,9 @@ public class NewCost extends AppCompatActivity implements ColorChooserDialog.Col
         DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 
         String Content = newCost.getCategory().getName() + "\n" + newCost.getAmount() + "\n" + newCost.getInterval() + "\n" + formatter.format(newCost.getStartDate().getTime()) + " to " + formatter.format(newCost.getEndDate().getTime());
-        for (int i = 0; i < house.getMembers().size(); i++){
-            costSplits.add(new CostSplit(house.getMembers().get(i).getFacebookID(), newCost.getAmount()/house.getMembers().size()));
-            Content = Content.concat("\n" + costSplits.get(i).getUserFacebookID() + " pays " + costSplits.get(i).getAmount());
+        for (int i = 0; i < newCost.getSplit().size(); i++) {
+            Content = Content.concat("\n" + newCost.getSplit().get(i).getName() + " pays " + newCost.getSplit().get(i).getAmount());
         }
-        newCost.setSplit(costSplits);
-
 
 
         new MaterialDialog.Builder(this)

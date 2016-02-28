@@ -1,6 +1,8 @@
 package itt.matthew.houseshare.Activities;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -11,9 +13,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.facebook.Profile;
 import com.microsoft.windowsazure.mobileservices.MobileServiceClient;
 import com.microsoft.windowsazure.mobileservices.MobileServiceList;
+import com.microsoft.windowsazure.mobileservices.authentication.MobileServiceUser;
 import com.microsoft.windowsazure.mobileservices.http.ServiceFilterResponse;
 import com.microsoft.windowsazure.mobileservices.table.MobileServiceTable;
 import com.microsoft.windowsazure.mobileservices.table.TableOperationCallback;
@@ -40,6 +42,11 @@ public class GroupCreate extends AppCompatActivity {
     private MobileServiceTable<Account> mAccountTable;
 
 
+    public static final String SHAREDPREFFILE = "temp";
+    public static final String USERIDPREF = "uid";
+    public static final String TOKENPREF = "tkn";
+    public static final String FBTOKENPREF = "fbt";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,6 +61,7 @@ public class GroupCreate extends AppCompatActivity {
             mClient = new MobileServiceClient(
                     "https://backendhs.azurewebsites.net",
                     this
+
             );
 
         } catch (Exception e) {
@@ -63,6 +71,8 @@ public class GroupCreate extends AppCompatActivity {
 
         mHouseTable = mClient.getTable(House.class);
         mAccountTable = mClient.getTable(Account.class);
+        loadUserTokenCache(mClient);
+
 
         button = (Button) findViewById(R.id.button2);
         button.setOnClickListener(new View.OnClickListener() {
@@ -117,7 +127,7 @@ public class GroupCreate extends AppCompatActivity {
 
     public void getAccount(final House item){
 
-        mAccountTable.where().field("facebookID").eq(Profile.getCurrentProfile().getId()).execute(new TableQueryCallback<Account>() {
+        mAccountTable.where().field("facebookID").eq(workingAccount.getFacebookID()).execute(new TableQueryCallback<Account>() {
             @Override
             public void onCompleted(List<Account> result, int count, Exception exception, ServiceFilterResponse response) {
                 workingAccount = result.get(0);
@@ -127,6 +137,25 @@ public class GroupCreate extends AppCompatActivity {
             }
         });
 
+    }
+
+
+
+    private boolean loadUserTokenCache(MobileServiceClient client)
+    {
+        SharedPreferences prefs = getSharedPreferences(SHAREDPREFFILE, Context.MODE_PRIVATE);
+        String userId = prefs.getString(USERIDPREF, "undefined");
+        if (userId == "undefined")
+            return false;
+        String token = prefs.getString(TOKENPREF, "undefined");
+        if (token == "undefined")
+            return false;
+
+        MobileServiceUser user = new MobileServiceUser(userId);
+        user.setAuthenticationToken(token);
+        client.setCurrentUser(user);
+
+        return true;
     }
 
 

@@ -27,10 +27,6 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.color.ColorChooserDialog;
-import com.facebook.AccessToken;
-import com.facebook.FacebookActivity;
-import com.facebook.GraphRequest;
-import com.facebook.GraphResponse;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -113,6 +109,10 @@ public class AccountActivity extends AppCompatActivity implements AppBarLayout.O
         name = (TextView) findViewById(R.id.account_name);
         subtitle = (TextView) findViewById(R.id.account_subtitle);
         appbar = (AppBarLayout) findViewById(R.id.appbar);
+
+        window = this.getWindow();
+        window.setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark));
+        appbar.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
 
         name.setText(account.getName());
         subtitle.setText("Member of " + house.getName() + " house");

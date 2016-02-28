@@ -1,19 +1,23 @@
 package itt.matthew.houseshare.Fragments;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.common.eventbus.EventBus;
+import com.mikepenz.materialize.color.Material;
 
 import org.greenrobot.eventbus.Subscribe;
 
@@ -48,8 +52,27 @@ public class CostSplitFragment extends Fragment {
     private ArrayList<CostSplit> customCostsSplits;
     private double customAmounts;
     private int customPosition;
+    private MaterialDialog dialog;
     private Cost newCost = new Cost();
+    private int customCount;
 
+
+
+    private void initalizeSplit(){
+
+        CostSplit split;
+        ArrayList<CostSplit> splits = new ArrayList<>();
+
+        for (int i = 0; i < current_house.getMembers().size(); i++){
+            split = new CostSplit(current_house.getMembers().get(i).getFacebookID(), current_house.getMembers().get(i).getName(), 0, false);
+            splits.add(i, split);
+        }
+
+        newCost.setSplit(splits);
+
+        org.greenrobot.eventbus.EventBus.getDefault().post(new CostEvent(newCost));
+
+    }
 
 
     public CostSplitFragment() {
@@ -79,6 +102,21 @@ public class CostSplitFragment extends Fragment {
     public void onCostEvent(CostEvent costEvent){
         newCost = costEvent.getCost();
         adapter = new RVAccountAdapter(current_house, newCost, newCost.getSplit(), itemTouchListener);
+        double amount = newCost.getAmount();
+        double customAmount = calculateTotalCustomAmount(newCost.getSplit());
+
+        TextView textView = (TextView) getView().findViewById(R.id.amountDisplay);
+        textView.setText(String.format("%.2f", amount));
+        TextView textView1 = (TextView) getView().findViewById(R.id.customAmountDisplay);
+        textView1.setText(String.format("%.2f", customAmount));
+
+        if (Double.parseDouble(textView1.getText().toString()) < Double.parseDouble(textView.getText().toString()))
+        {
+            textView1.setTextColor(getResources().getColor(R.color.md_red_400));
+        }
+        else
+            textView1.setTextColor(getResources().getColor(R.color.colorPrimary));
+
         mRecyclerView.setAdapter(adapter);
     }
 
@@ -100,7 +138,10 @@ public class CostSplitFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
 
+
+
         setupData();
+
         itemTouchListener = new OnItemTouchListener() {
             @Override
             public void onCardViewTouch(View view, int position) {
@@ -112,26 +153,80 @@ public class CostSplitFragment extends Fragment {
                     }
                 };
 
-                new MaterialDialog.Builder(getContext())
-                        .title("Test")
+               dialog = new MaterialDialog.Builder(getContext())
+                        .title("Set Cost")
                         .adapter(new DialogAmountAdapter(getActivity(), seekBarChanged, position, newCost.getSplit(), current_house.getMembers()),
                                 new MaterialDialog.ListCallback() {
                                     @Override
                                     public void onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
-
                                     }
                                 })
                         .positiveText("Submit")
                         .onPositive(new MaterialDialog.SingleButtonCallback() {
-                                    @Override
-                                    public void onClick(MaterialDialog dialog, DialogAction which) {
-                                        ArrayList<CostSplit> costSplits = newCost.getSplit();
-                                        costSplits.set(customPosition, new CostSplit(costSplits.get(customPosition).getUserFacebookID(), customAmounts));
-                                        newCost.setSplit(costSplits);
-                                        org.greenrobot.eventbus.EventBus.getDefault().post(new CostEvent(newCost));
+                            @Override
+                            public void onClick(MaterialDialog dialog, DialogAction which) {
+                                ArrayList<CostSplit> costSplits = newCost.getSplit();
+                                costSplits.set(customPosition, new CostSplit(costSplits.get(customPosition).getUserFacebookID(), costSplits.get(customPosition).getName(), customAmounts, true));
+                                newCost.setSplit(costSplits);
+                                double newSplitAmount = calculateAmount(costSplits);
+                                newSplitAmount = newSplitAmount / (costSplits.size() - customCount);
+
+                                for (int i = 0; i < costSplits.size(); i++) {
+                                    if (!costSplits.get(i).getCustom()) {
+                                        costSplits.get(i).setAmount(newSplitAmount);
                                     }
-                                })
+                                }
+
+                                org.greenrobot.eventbus.EventBus.getDefault().post(new CostEvent(newCost));
+                            }
+                        })
                                         .show();
+            }
+
+            @Override
+            public void onCheckViewTouch(View view, final int position){
+
+                final MaterialDialog materialDialog = new MaterialDialog.Builder(getContext())
+                        .title("Are you sure?")
+                        .content("This will reset your custom amount")
+                        .positiveText("Confirm")
+                        .negativeText("Cancel")
+                        .cancelable(false)
+                        .onPositive(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(MaterialDialog dialog, DialogAction which) {
+
+                                ArrayList<CostSplit> costSplits = newCost.getSplit();
+                                costSplits.set(position, new CostSplit(costSplits.get(position).getUserFacebookID(), costSplits.get(position).getName(),newCost.getAmount() / costSplits.size() , false));
+                                customCount--;
+                                newCost.setSplit(costSplits);
+                                double newSplitAmount = calculateAmount(costSplits);
+                                newSplitAmount = newSplitAmount / (costSplits.size() - customCount);
+
+                                for (int i = 0; i < costSplits.size(); i++) {
+                                    if (!costSplits.get(i).getCustom()) {
+                                        costSplits.get(i).setAmount(newSplitAmount);
+                                    }
+                                }
+
+                                org.greenrobot.eventbus.EventBus.getDefault().post(new CostEvent(newCost));
+
+                                dialog.dismiss();
+                            }
+                        })
+                        .onNegative(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(MaterialDialog dialog, DialogAction which) {
+
+
+                                org.greenrobot.eventbus.EventBus.getDefault().post(new CostEvent(newCost));
+                                dialog.dismiss();
+                            }
+                        })
+                        .build();
+
+                materialDialog.show();
+
             }
         };
 
@@ -139,6 +234,42 @@ public class CostSplitFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+    }
+
+
+    private double calculateTotalCustomAmount(ArrayList<CostSplit> splits){
+
+        double customAmount = 0;
+
+
+        for (int i = 0; i < splits.size(); i++) {
+
+
+            customAmount = customAmount + splits.get(i).getAmount();
+        }
+
+
+
+        return  customAmount;
+
+    }
+
+    private double calculateAmount(ArrayList<CostSplit> splits){
+
+        double customAmount =0;
+        customCount = 0;
+
+        for (int i = 0; i < splits.size(); i++){
+
+            if (splits.get(i).getCustom()){
+
+                customCount++;
+                customAmount = customAmount + splits.get(i).getAmount() ;
+            }
+        }
+
+
+        return newCost.getAmount() - customAmount;
     }
 
     private void setupData(){
@@ -158,6 +289,7 @@ public class CostSplitFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_cost_split, container, false);
 
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.account_rv);
+        initalizeSplit();
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         newCost.setAmount(0);
@@ -202,6 +334,8 @@ public class CostSplitFragment extends Fragment {
 
     public interface OnItemTouchListener {
         public void onCardViewTouch(View view, int position);
+        public void onCheckViewTouch(View view, int position);
+
     }
 }
 

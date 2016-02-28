@@ -3,10 +3,44 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <RelativeLayout
+        android:id="@+id/headerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="35dp"
+        android:layout_alignParentTop="true">
+
+
+        <TextView
+            android:id="@+id/amount.divider"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=" / "
+            android:textSize="30sp"
+            android:layout_centerHorizontal="true"/>
+
+
+        <TextView
+            android:id="@+id/amountDisplay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="30sp"
+            android:layout_toRightOf="@id/amount.divider"/>
+
+        <TextView
+            android:id="@+id/customAmountDisplay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="30sp"
+            android:layout_toLeftOf="@id/amount.divider"
+            />
+
+    </RelativeLayout>
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/account.rv"
+        android:layout_below="@+id/headerLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent" />
 
 
 </RelativeLayout>

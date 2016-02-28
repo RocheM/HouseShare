@@ -94,21 +94,18 @@ public class color_dialog extends Fragment {
         colors.add(getResources().getColor(R.color.colorPrimary));
         colors.add(getResources().getColor(R.color.colorAccent));
         colors.add(getResources().getColor(R.color.colorPrimaryDark));
-        colors.add(getResources().getColor(R.color.com_facebook_blue));
 
         colors.add(getResources().getColor(R.color.colorPrimary));
         colors.add(getResources().getColor(R.color.colorAccent));
         colors.add(getResources().getColor(R.color.colorPrimaryDark));
-        colors.add(getResources().getColor(R.color.com_facebook_blue));
 
         colors.add(getResources().getColor(R.color.colorPrimary));
         colors.add(getResources().getColor(R.color.colorAccent));
         colors.add(getResources().getColor(R.color.colorPrimaryDark));
-        colors.add(getResources().getColor(R.color.com_facebook_blue));
 
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.color_rv);
 
-        mLayoutManager = new GridLayoutManager(getActivity(), 4);
+        mLayoutManager = new GridLayoutManager(getActivity(), 3);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         adapter = new RVColorAdapter(colors);

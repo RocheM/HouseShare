@@ -34,6 +34,7 @@ public class DialogAmountAdapter extends BaseAdapter implements MaterialDialog.L
     private final LayoutInflater mInflater;
     private int person;
     private CostSplitFragment.onDialogSeekBarChanged seekBarChanged;
+    private Double total = 0.0;
 
     public DialogAmountAdapter(Activity context, CostSplitFragment.onDialogSeekBarChanged seekBarChanged,int person, ArrayList<CostSplit> costSplits, ArrayList<Account> members){
 
@@ -42,6 +43,14 @@ public class DialogAmountAdapter extends BaseAdapter implements MaterialDialog.L
         this.splits = costSplits;
         this.members = members;
         this.seekBarChanged = seekBarChanged;
+
+        total = 0.0;
+        for(int j = 0; j < splits.size(); j++){
+            if (!(splits.get(j)).getCustom())
+                total = total + splits.get(j).getAmount();
+        }
+
+
     }
 
     @Override
@@ -85,24 +94,6 @@ public class DialogAmountAdapter extends BaseAdapter implements MaterialDialog.L
         });
     }
 
-    private double calculateAmount(){
-
-        double amount = 0, total =0;
-
-
-        for (int i = 0; i < splits.size(); i++){
-            total += splits.get(i).getAmount();
-        }
-
-        amount = total;
-        for (int i = 0; i < splits.size(); i++){
-            amount -= splits.get(i).getAmount();
-
-        }
-
-
-        return amount;
-    }
 
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
@@ -113,6 +104,7 @@ public class DialogAmountAdapter extends BaseAdapter implements MaterialDialog.L
         TextView amount;
         SeekBar seekBar;
 
+
         if (v == null) {
             v = mInflater.inflate(R.layout.dialog_amount, viewGroup, false);
         }
@@ -121,10 +113,10 @@ public class DialogAmountAdapter extends BaseAdapter implements MaterialDialog.L
         name = (TextView) v.findViewById(R.id.card_profile_name);
         name.setText(members.get(person).getName());
         amount = (TextView) v.findViewById(R.id.card_profile_amount);
-        amount.setText(Double.toString(splits.get(person).getAmount()));
+        amount.setText(String.format("%.2f", total));
 
         seekBar = (SeekBar) v.findViewById(R.id.card_profile_seekbar);
-        seekBar.setMax((int) (splits.get(person).getAmount() + 0.5d));
+        seekBar.setMax((int) (total + 0.5d));
         bind(seekBar, amount, person, seekBarChanged);
 
 

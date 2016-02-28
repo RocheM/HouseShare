@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -52,17 +53,22 @@ public class RVAccountAdapter extends RecyclerView.Adapter<RVAccountAdapter.Acco
         TextView profileName;
         TextView profileAmount;
         SeekBar profileSeekBar;
+        CheckBox checkBox;
         Account currentItem;
         MaterialDialog splitDialog;
         Cost currentCost;
 
 
-        private void bind(final CardView item, final int position, final CostSplitFragment.OnItemTouchListener  listener) {
+        private void bind(final View item, final int position, final int type, final CostSplitFragment.OnItemTouchListener  listener) {
 
             item.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    listener.onCardViewTouch(item, position);
+                    if (type == 0) {
+                        listener.onCardViewTouch(item, position);
+                    }
+                    else
+                        listener.onCheckViewTouch(item, position);
                 }
             });
         }
@@ -77,7 +83,7 @@ public class RVAccountAdapter extends RecyclerView.Adapter<RVAccountAdapter.Acco
             profileName = (TextView)itemView.findViewById(R.id.card_profile_name);
             profileAmount = (TextView)itemView.findViewById(R.id.card_profile_amount);
             profileSeekBar = (SeekBar)itemView.findViewById(R.id.card_profile_seekbar);
-
+            checkBox = (CheckBox) itemView.findViewById(R.id.card_profile_custom);
 
         }
     }
@@ -92,7 +98,7 @@ public class RVAccountAdapter extends RecyclerView.Adapter<RVAccountAdapter.Acco
 
     @Override
     public int getItemCount() {
-        return persons.getMembers().size();
+        return splits.size();
     }
 
     @Override
@@ -114,17 +120,29 @@ public class RVAccountAdapter extends RecyclerView.Adapter<RVAccountAdapter.Acco
          split = 0;
         }
         else {
-            split = splits.get(i).getAmount();
+            for (int j = 0; j < persons.getMembers().size(); j++){
+                for (int k = 0; k < splits.size(); k++){
+                    if (splits.get(k).getUserFacebookID().equals(persons.getMembers().get(i).getFacebookID())){
+
+                        accountViewHolder.profileName.setText(members.get(i).getName());
+                        accountViewHolder.profileAmount.setText(String.format("%.2f", splits.get(k).getAmount()));
+                        if (splits.get(k).getCustom()) {
+                            accountViewHolder.checkBox.setChecked(true);
+                            accountViewHolder.checkBox.setVisibility(View.VISIBLE);
+                            accountViewHolder.bind(accountViewHolder.checkBox, accountViewHolder.getAdapterPosition(), 1, onItemTouchListener);
+
+                        }
+                        accountViewHolder.bind(accountViewHolder.cardView, accountViewHolder.getAdapterPosition(), 0, onItemTouchListener);
+                        Picasso.with(currentContext).load("http://graph.facebook.com/"+members.get(i).getFacebookID()+"/picture?type=large").into(accountViewHolder.profilePic);
+
+                        accountViewHolder.currentItem = members.get(i);
+                        accountViewHolder.currentCost = cost;
+
+
+                    }
+                }
+            }
         }
-
-        accountViewHolder.profileName.setText(members.get(i).getName());
-        accountViewHolder.profileAmount.setText(Double.toString(split));
-        accountViewHolder.bind(accountViewHolder.cardView, accountViewHolder.getAdapterPosition(), onItemTouchListener);
-        Picasso.with(currentContext).load("http://graph.facebook.com/"+members.get(i).getFacebookID()+"/picture?type=large").into(accountViewHolder.profilePic);
-
-
-        accountViewHolder.currentItem = members.get(i);
-        accountViewHolder.currentCost = cost;
 
     }
 

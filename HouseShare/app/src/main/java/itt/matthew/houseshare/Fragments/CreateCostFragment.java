@@ -110,7 +110,7 @@ public class CreateCostFragment extends Fragment {
         WorkingCost.setAmount(0);
         ArrayList<CostSplit> newCostSplit = new ArrayList<>();
         for(int i = 0; i < house.getMembers().size(); i++){
-            CostSplit temp = new CostSplit(house.getMembers().get(i).getFacebookID(), 0);
+            CostSplit temp = new CostSplit(house.getMembers().get(i).getFacebookID(), house.getMembers().get(i).getName(), 0, false);
             newCostSplit.add(temp);
         }
         WorkingCost.setSplit(newCostSplit);
@@ -218,7 +218,7 @@ public class CreateCostFragment extends Fragment {
                         ArrayList<CostSplit> costSplits = new ArrayList<CostSplit>();
                         double divide = WorkingCost.getAmount() / house.getMembers().size();
                         for (int i = 0; i < house.getMembers().size(); i++){
-                            CostSplit split = new CostSplit(house.getMembers().get(i).getFacebookID(), divide);
+                            CostSplit split = new CostSplit(house.getMembers().get(i).getFacebookID(), house.getMembers().get(i).getName(), divide, false);
                             costSplits.add(split);
                         }
                         WorkingCost.setSplit(costSplits);

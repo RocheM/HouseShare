@@ -41,6 +41,12 @@ public class CostDetails extends AppCompatActivity {
             public void onCardViewTouch(View view, int position) {
 
             }
+
+            @Override
+            public void onCheckViewTouch(View view, int position) {
+
+            }
+
         };
 
         owners.setAdapter(new RVAccountAdapter(house, cost, cost.getSplit(), itemTouchListener));

@@ -4,8 +4,6 @@ import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.facebook.Profile;
-
 /**
  * Created by Matthew on 11/23/2015.
  */
@@ -14,19 +12,15 @@ public class Account implements Parcelable {
     private String Id;
     private String facebookID;
     private String name;
-    private String birthday;
-    private String location;
-    private String about;
+    private String email;
     private String coverPhotoURL;
     private int houseID = -1;
 
-    public Account(String facebookID, String name, String birthday, String location, String about, String coverPhotoURL){
+    public Account(String facebookID, String name, String email, String coverPhotoURL){
 
         this.facebookID = facebookID;
         this.name = name;
-        this.birthday = birthday;
-        this.location = location;
-        this.about = about;
+        this.email = email;
         this.coverPhotoURL = coverPhotoURL;
 
     }
@@ -52,29 +46,13 @@ public class Account implements Parcelable {
     }
 
 
-    public String getBirthday(){
-        return birthday;
-    }
-    public void setBirthday(String birthday){
-        this.birthday = birthday;
+    public String getEmail(){
+        return email;
     }
 
-    public String getLocation(){
-        return location;
+    public void setEmail(String location){
+        this.email = location;
     }
-
-    public void setLocation(String location){
-        this.location = location;
-    }
-
-    public String getAbout(){
-        return about;
-    }
-
-    public void setAbout(String about){
-        this.about = about;
-    }
-
     public String getFacebookID(){
         return facebookID;
     }
@@ -102,9 +80,7 @@ public class Account implements Parcelable {
         out.writeString(Id);
         out.writeString(facebookID);
         out.writeString(name);
-        out.writeString(birthday);
-        out.writeString(location);
-        out.writeString(about);
+        out.writeString(email);
         out.writeString(coverPhotoURL);
         out.writeInt(houseID);
     }
@@ -113,9 +89,7 @@ public class Account implements Parcelable {
         Id = in.readString();
         facebookID = in.readString();
         name = in.readString();
-        birthday = in.readString();
-        location = in.readString();
-        about = in.readString();
+        email = in.readString();
         coverPhotoURL = in.readString();
         houseID = in.readInt();
 

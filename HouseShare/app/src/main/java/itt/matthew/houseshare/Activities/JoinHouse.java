@@ -7,8 +7,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.facebook.Profile;
-
 import itt.matthew.houseshare.Models.Account;
 import itt.matthew.houseshare.R;
 
@@ -62,7 +60,7 @@ public class JoinHouse extends AppCompatActivity {
             }
         });
 
-        welcomeMessage.append(" " + Profile.getCurrentProfile().getName() + "\nYou aren't a member of any houses, please select an option to join one");
+        welcomeMessage.append(" " + current + "\nYou aren't a member of any houses, please select an option to join one");
 
     }
 }
