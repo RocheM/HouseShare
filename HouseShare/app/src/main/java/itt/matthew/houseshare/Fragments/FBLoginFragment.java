@@ -1,7 +1,5 @@
 package itt.matthew.houseshare.Fragments;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -14,26 +12,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.ProtocolException;
-import java.net.URI;
-import java.net.URL;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 
+import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.google.android.gms.iid.InstanceID;
 import com.google.common.util.concurrent.SettableFuture;
 import com.microsoft.windowsazure.mobileservices.authentication.MobileServiceAuthenticationProvider;
 import com.microsoft.windowsazure.mobileservices.authentication.MobileServiceUser;
@@ -52,17 +40,19 @@ import com.microsoft.windowsazure.mobileservices.http.ServiceFilterResponse;
 import com.microsoft.windowsazure.mobileservices.table.MobileServiceTable;
 import com.microsoft.windowsazure.mobileservices.table.TableOperationCallback;
 import com.microsoft.windowsazure.mobileservices.table.TableQueryCallback;
-import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
+import com.microsoft.windowsazure.notifications.NotificationsManager;
+
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
+
 
 import itt.matthew.houseshare.Activities.JoinHouse;
 import itt.matthew.houseshare.Activities.MainActivity;
+import itt.matthew.houseshare.Events.MyHandler;
 import itt.matthew.houseshare.Models.Account;
 import itt.matthew.houseshare.R;
 
@@ -82,9 +72,8 @@ public class FBLoginFragment extends Fragment {
     public static final String TOKENPREF = "tkn";
     public static final String FBTOKENPREF = "fbt";
 
-
     private OnFragmentInteractionListener mListener;
-    private MobileServiceClient mClient;
+    public static MobileServiceClient mClient;
     private Account newAccount;
     private MobileServiceTable<Account> mAccountTable;
     private JSONObject JSONresponse;
@@ -115,6 +104,7 @@ public class FBLoginFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         setupAzure();
+
 
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
@@ -447,9 +437,10 @@ public class FBLoginFragment extends Fragment {
                             newAccount = result.get(0);
 
                             if (newAccount.getHouseID() == -1) {
-                                startJoinHouseActivity(newAccount);
-                            } else
-                            startMainActivity(newAccount);
+                                 startJoinHouseActivity(newAccount);
+                            } else {
+                            }
+                             startMainActivity(newAccount);
                         }
                     } else {
                         exception.printStackTrace();

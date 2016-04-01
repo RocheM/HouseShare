@@ -42,6 +42,7 @@ import com.google.common.eventbus.EventBus;
 import com.microsoft.windowsazure.mobileservices.MobileServiceClient;
 import com.microsoft.windowsazure.mobileservices.authentication.MobileServiceUser;
 import com.microsoft.windowsazure.mobileservices.table.MobileServiceTable;
+import com.microsoft.windowsazure.notifications.NotificationsManager;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -54,6 +55,7 @@ import java.util.GregorianCalendar;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import itt.matthew.houseshare.Events.CostEvent;
+import itt.matthew.houseshare.Events.MyHandler;
 import itt.matthew.houseshare.Fragments.CostSplitFragment;
 import itt.matthew.houseshare.Fragments.CreateCostFragment;
 import itt.matthew.houseshare.Fragments.TasksFragment;
@@ -68,7 +70,7 @@ import itt.matthew.houseshare.R;
 public class NewCost extends AppCompatActivity implements ColorChooserDialog.ColorCallback {
 
 
-    private MobileServiceClient mClient;
+    public static MobileServiceClient mClient;
     private MobileServiceTable<Account> mAccountTable;
     private MobileServiceTable<House> mHouseTable;
 
@@ -96,6 +98,7 @@ public class NewCost extends AppCompatActivity implements ColorChooserDialog.Col
     public static final String USERIDPREF = "uid";
     public static final String TOKENPREF = "tkn";
     public static final String FBTOKENPREF = "fbt";
+    public static final String SENDER_ID = "18540511502";
 
 
     @Override
@@ -131,6 +134,8 @@ public class NewCost extends AppCompatActivity implements ColorChooserDialog.Col
         loadUserTokenCache(mClient);
         mAccountTable = mClient.getTable(Account.class);
         mHouseTable = mClient.getTable(House.class);
+        NotificationsManager.handleNotifications(this, SENDER_ID, MyHandler.class);
+
     }
 
 
@@ -277,7 +282,7 @@ public class NewCost extends AppCompatActivity implements ColorChooserDialog.Col
                                 boolean error = false;
                                 ColorDrawable  drawable = new ColorDrawable(getResources().getColor(R.color.white));
                                 colorPreview.setImageDrawable(drawable);
-                                colorPreviewText.setText("Selected Color");
+                                colorPreviewText.setText(R.string.selectedColor);
 
 
 
@@ -352,7 +357,7 @@ public class NewCost extends AppCompatActivity implements ColorChooserDialog.Col
 
                 ColorDrawable  drawable = new ColorDrawable(getResources().getColor(R.color.white));
                 colorPreview.setImageDrawable(drawable);
-                colorPreviewText.setText("Selected Color");
+                colorPreviewText.setText(R.string.selectedColor);
 
 
 
@@ -409,7 +414,7 @@ public class NewCost extends AppCompatActivity implements ColorChooserDialog.Col
                     mHouseTable.update(item).get();
                     runOnUiThread(new Runnable() {
                         public void run() {
-                            finish();
+                           finish();
                         }
                     });
                 } catch (Exception exception) {
@@ -472,7 +477,7 @@ public class NewCost extends AppCompatActivity implements ColorChooserDialog.Col
 
         DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 
-        String Content = newCost.getCategory().getName() + "\n" + newCost.getAmount() + "\n" + newCost.getInterval() + "\n" + formatter.format(newCost.getStartDate().getTime()) + " to " + formatter.format(newCost.getEndDate().getTime());
+        String Content = newCost.getCategory().getName() + "\n" + newCost.getAmount() + "\nInterval:\t" + newCost.getInterval() + "\nDates: " + formatter.format(newCost.getStartDate().getTime()) + " to " + formatter.format(newCost.getEndDate().getTime());
         for (int i = 0; i < newCost.getSplit().size(); i++) {
             Content = Content.concat("\n" + newCost.getSplit().get(i).getName() + " pays " + newCost.getSplit().get(i).getAmount());
         }
@@ -487,6 +492,7 @@ public class NewCost extends AppCompatActivity implements ColorChooserDialog.Col
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
 
                         ArrayList<Cost> costs = house.getCost();
+                        newCost.initalizeIntervals();
                         costs.add(newCost);
                         house.setCosts(costs);
                         updateItem(house);

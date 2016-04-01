@@ -148,7 +148,7 @@ public class FinanceFragment extends Fragment {
         mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        adapter = new RVAdapter(current_house);
+        adapter = new RVAdapter(current_house, current_account);
 
         mRecyclerView.setAdapter(adapter);
         mRecyclerView.setClickable(true);
@@ -243,10 +243,10 @@ public class FinanceFragment extends Fragment {
 
     private void populateItems(){
 
-        adapter = new RVAdapter(current_house);
+        adapter = new RVAdapter(current_house, current_account);
         mRecyclerView.setAdapter(adapter);
 
-        adapter = new RVAdapter(current_house);
+        adapter = new RVAdapter(current_house, current_account);
         mRecyclerView.setAdapter(adapter);
 
     }

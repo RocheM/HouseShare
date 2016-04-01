@@ -3,8 +3,11 @@ package itt.matthew.houseshare.Activities;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
@@ -15,11 +18,19 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import itt.matthew.houseshare.Adapters_CustomViews.DateGridAdapter;
 import itt.matthew.houseshare.Adapters_CustomViews.RVAccountAdapter;
 import itt.matthew.houseshare.Adapters_CustomViews.RVAdapter;
+import itt.matthew.houseshare.Events.OverviewEvent;
+import itt.matthew.houseshare.Fragments.CostOverviewFragment;
 import itt.matthew.houseshare.Fragments.CostSplitFragment;
+import itt.matthew.houseshare.Fragments.DetailsFragment;
+import itt.matthew.houseshare.Fragments.FinanceFragment;
+import itt.matthew.houseshare.Fragments.PersonalCostOverview;
+import itt.matthew.houseshare.Fragments.TasksFragment;
 import itt.matthew.houseshare.Models.Account;
 import itt.matthew.houseshare.Models.Cost;
+import itt.matthew.houseshare.Models.CostSplit;
 import itt.matthew.houseshare.Models.House;
 import itt.matthew.houseshare.R;
 import com.paypal.android.MEP.CheckoutButton;
@@ -29,16 +40,23 @@ import com.paypal.android.MEP.PayPalInvoiceData;
 import com.paypal.android.MEP.PayPalInvoiceItem;
 import com.paypal.android.MEP.PayPalPayment;
 
+import org.greenrobot.eventbus.Subscribe;
+import org.w3c.dom.Text;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 
-public class CostDetails extends AppCompatActivity implements View.OnClickListener {
+public class CostDetails extends AppCompatActivity {
 
     private House house;
+    private Account current;
     private Cost cost;
-    private boolean _paypalLibraryInit;
-    private CheckoutButton launchPayPalButton;
-    private final int REQUEST_PAYPAL_CHECKOUT = 2;
+    private CostSplit curr;
+    private int selectedUser = -1;
+
+
+    private FragmentTransaction fragmentTransaction;
+    private FragmentManager fragmentManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,159 +66,87 @@ public class CostDetails extends AppCompatActivity implements View.OnClickListen
         setupData();
         setupUI();
 
+        fragmentManager = getSupportFragmentManager();
+
+        loadSelection(0);
+
     }
 
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        org.greenrobot.eventbus.EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        org.greenrobot.eventbus.EventBus.getDefault().unregister(this);
+    }
+
+
+    @Subscribe
+    public void onEvent(OverviewEvent event){
+
+        selectedUser = event.getIndex();
+        loadSelection(1);
+
+    }
+
     private void setupUI(){
 
-        initLibrary();
-        showPayPalButton();
+//        RecyclerView rv = (RecyclerView) findViewById(R.id.cost_detail_rv);
+//        rv.setLayoutManager(new GridLayoutManager(this, 2));
+//        rv.setAdapter(new DateGridAdapter(house, current, cost, getApplicationContext()));
+
+
     }
 
     private void setupData(){
 
+
         Bundle b = getIntent().getBundleExtra("extra");
         house = b.getParcelable("house");
         int costLocation = b.getInt("cost");
+        current = b.getParcelable("account");
         cost = house.getCost().get(costLocation);
 
     }
 
-    public void initLibrary() {
-        PayPal pp = PayPal.getInstance();
 
-        if (pp == null) {  // Test to see if the library is already initialized
-
-            // This main initialization call takes your Context, AppID, and target server
-            pp = PayPal.initWithAppID(this, "APP-80W284485P519543T", PayPal.ENV_NONE);
-
-
-            // Required settings:
-
-            // Set the language for the library
-            pp.setLanguage("en_US");
-
-            // Some Optional settings:
-
-            // Sets who pays any transaction fees. Possible values are:
-            // FEEPAYER_SENDER, FEEPAYER_PRIMARYRECEIVER, FEEPAYER_EACHRECEIVER, and FEEPAYER_SECONDARYONLY
-            pp.setFeesPayer(PayPal.FEEPAYER_EACHRECEIVER);
-
-            // true = transaction requires shipping
-            pp.setShippingEnabled(false);
-
-            _paypalLibraryInit = true;
-        }
-    }
-
-    private void showPayPalButton() {
-
-        // Generate the PayPal checkout button and save it for later use
-        PayPal pp = PayPal.getInstance();
-        launchPayPalButton = pp.getCheckoutButton(this, PayPal.BUTTON_278x43, CheckoutButton.TEXT_PAY);
-
-
-        // The OnClick listener for the checkout button
-        launchPayPalButton.setOnClickListener(this);
-
-        // Add the listener to the layout
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams (AbsListView.LayoutParams.WRAP_CONTENT,
-                AbsListView.LayoutParams.WRAP_CONTENT);
-        params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-        params.bottomMargin = 10;
-        launchPayPalButton.setLayoutParams(params);
-        launchPayPalButton.setId(View.generateViewId());
-        ((RelativeLayout) findViewById(R.id.RelativeLayout01)).addView(launchPayPalButton);
-        ((RelativeLayout) findViewById(R.id.RelativeLayout01)).setGravity(Gravity.CENTER_HORIZONTAL);
-    }
-
-
-
-    public void PayPalButtonClick(View arg0) {
-        // Create a basic PayPal payment
-        PayPalPayment payment = new PayPalPayment();
-
-        // Set the currency type
-        payment.setCurrencyType("USD");
-
-        // Set the recipient for the payment (can be a phone number)
-        payment.setRecipient("matthew.the.roche@gmail.com");
-
-        // Set the payment amount, excluding tax and shipping costs
-        payment.setSubtotal(new BigDecimal(20));
-
-        // Set the payment type--his can be PAYMENT_TYPE_GOODS,
-        // PAYMENT_TYPE_SERVICE, PAYMENT_TYPE_PERSONAL, or PAYMENT_TYPE_NONE
-        payment.setPaymentType(PayPal.PAYMENT_TYPE_GOODS);
-
-        // PayPalInvoiceData can contain tax and shipping amounts, and an
-        // ArrayList of PayPalInvoiceItem that you can fill out.
-        // These are not required for any transaction.
-        PayPalInvoiceData invoice = new PayPalInvoiceData();
-
-        // Set the tax amount
-        invoice.setTax(new BigDecimal(2));
-        PayPalInvoiceItem item = new PayPalInvoiceItem();
-        item.setID("1");
-        item.setName("House");
-        item.setTotalPrice(BigDecimal.valueOf(20.00));
-        item.setQuantity(1);
-
-        ArrayList<PayPalInvoiceItem> items = new ArrayList<>();
-        items.add(item);
-        invoice.setInvoiceItems(items);
-        payment.setMerchantName("House Share");
-        payment.setInvoiceData(invoice);
-
-
-        Intent checkoutIntent = PayPal.getInstance().checkout(payment, this);
-        startActivityForResult(checkoutIntent, REQUEST_PAYPAL_CHECKOUT);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-            PayPalActivityResult(requestCode, resultCode, data);
-    }
-
-    public void PayPalActivityResult(int requestCode, int resultCode, Intent intent) {
-        switch (resultCode) {
-            // The payment succeeded
-            case Activity.RESULT_OK:
-                String payKey = intent.getStringExtra(PayPalActivity.EXTRA_PAY_KEY);
-                this.paymentSucceeded(payKey);
+    private void loadSelection(int i){
+        switch (i) {
+            case 0:
+                CostOverviewFragment overviewFragment = new CostOverviewFragment();
+                setTitle("Cost Overview");
+                fragmentTransaction = fragmentManager.beginTransaction();
+                Bundle bundle = new Bundle();
+                bundle.putParcelable("house", house);
+                bundle.putParcelable("account", current);
+                bundle.putInt("cost", getIntent().getBundleExtra("extra").getInt("cost"));
+                getIntent().putExtra("extra", bundle);
+                fragmentTransaction.replace(R.id.detailsFragmentHolder, overviewFragment);
+                fragmentTransaction.addToBackStack(overviewFragment.getTag());
+                fragmentTransaction.commit();
                 break;
-
-            // The payment was canceled
-            case Activity.RESULT_CANCELED:
-                this.paymentCanceled();
+            case 1:
+                PersonalCostOverview personalCostOverview= new PersonalCostOverview();
+                setTitle("Cost Overview");
+                fragmentTransaction = fragmentManager.beginTransaction();
+                bundle = new Bundle();
+                bundle.putParcelable("house", house);
+                bundle.putParcelable("account", current);
+                bundle.putInt("cost", getIntent().getBundleExtra("extra").getInt("cost"));
+                bundle.putInt("selected", selectedUser);
+                getIntent().putExtra("extra", bundle);
+                fragmentTransaction.replace(R.id.detailsFragmentHolder, personalCostOverview);
+                fragmentTransaction.addToBackStack(personalCostOverview.getTag());
+                fragmentTransaction.commit();
                 break;
-
-            // The payment failed, get the error from the EXTRA_ERROR_ID and EXTRA_ERROR_MESSAGE
-            case PayPalActivity.RESULT_FAILURE:
-                String errorID = intent.getStringExtra(PayPalActivity.EXTRA_ERROR_ID);
-                String errorMessage = intent.getStringExtra(PayPalActivity.EXTRA_ERROR_MESSAGE);
-                this.paymentFailed(errorID, errorMessage);
         }
+
     }
 
-    private void paymentSucceeded(String paykey){
 
-        Toast.makeText(this, "SUCCESS " + paykey, Toast.LENGTH_SHORT).show();
-    }
-
-    private void paymentCanceled(){
-
-        Toast.makeText(this, "Cancelled", Toast.LENGTH_SHORT).show();
-    }
-
-    private void paymentFailed(String errorID, String errorMessage){
-
-
-        Toast.makeText(this, "FAILURE: " + errorID + " : " + errorMessage, Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onClick(View v) {
-        PayPalButtonClick(v);
-    }
 }

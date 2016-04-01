@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,12 +17,17 @@ import android.widget.Toast;
 
 import org.w3c.dom.Text;
 
+import java.security.AccessControlContext;
+import java.text.DateFormat;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 
 import itt.matthew.houseshare.Activities.CostDetails;
+import itt.matthew.houseshare.Models.Account;
 import itt.matthew.houseshare.Models.Cost;
 import itt.matthew.houseshare.Models.House;
 import itt.matthew.houseshare.R;
@@ -31,6 +37,7 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.PersonViewHolder> 
 
     private House persons;
     private RecyclerView recyclerView;
+    private Account account;
 
     public static class PersonViewHolder extends RecyclerView.ViewHolder {
         private CardView cv;
@@ -41,6 +48,7 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.PersonViewHolder> 
         private ImageView CostColor;
         private int currentItem;
         private House house;
+        private Account acc;
 
 
         PersonViewHolder(View itemView) {
@@ -60,6 +68,7 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.PersonViewHolder> 
                     Intent i = new Intent(v.getContext(), CostDetails.class);
                     Bundle b = new Bundle();
                     b.putParcelable("house", house);
+                    b.putParcelable("account", acc);
                     b.putInt("cost", currentItem);
                     i.putExtra("extra", b);
                     v.getContext().startActivity(i);
@@ -68,8 +77,9 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.PersonViewHolder> 
         }
     }
 
-    public RVAdapter(House persons){
+    public RVAdapter(House persons, Account account){
         this.persons = new House(persons);
+        this.account = account;
 
     }
 
@@ -92,21 +102,47 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.PersonViewHolder> 
 
         ArrayList<Cost> costs = persons.getCost();
         personViewHolder.house = new House(persons);
-        SimpleDateFormat formatter = new SimpleDateFormat("dd/MMM/yyyy");
-
-
+        personViewHolder.acc = account;
+        DateFormat formatter = DateFormat.getDateInstance(DateFormat.SHORT);
+        NumberFormat format = NumberFormat.getCurrencyInstance(Locale.GERMANY);
 
 
         personViewHolder.CostCategory.setText(costs.get(i).getCategory().getName());
         personViewHolder.CostCategory.setTextColor(costs.get(i).getCategory().getColor());
         personViewHolder.CostDate.setText(formatter.format(costs.get(i).getStartDate().getTime()) + " to " + formatter.format(costs.get(i).getEndDate().getTime()));
-        personViewHolder.CostInterval.setText(Integer.toString(costs.get(i).getInterval()));
-        personViewHolder.CostAmount.setText(Double.toString(costs.get(i).getAmount()));
+        personViewHolder.CostInterval.setText("Next payment: " + formatter.format(getNextDate(costs.get(i)).getTime()));
+        personViewHolder.CostAmount.setText(format.format(costs.get(i).getAmount()));
         personViewHolder.CostColor.setBackgroundColor(costs.get(i).getCategory().getColor());
 
 
         personViewHolder.currentItem = i;
 
+    }
+
+    private Date getNextDate(Cost c){
+
+        ArrayList<Integer> results = new ArrayList<>();
+
+        for (int i = 0; i <c.getIntervals().size(); i++){
+            if(c.getIntervals().get(i).getDate() == Calendar.getInstance()){
+                return c.getIntervals().get(i).getDate().getTime();
+            }else{
+                results.add(c.daysBetween(c.getIntervals().get(i).getDate().getTime(), Calendar.getInstance().getTime()));
+            }
+        }
+
+        int small = results.get(0);
+        int index = 0;
+
+        for (int i = 0; i < results.size(); i++) {
+            if (results.get(i) < small) {
+                small = results.get(i);
+                index = i;
+            }
+        }
+
+
+        return c.getIntervals().get(index).getDate().getTime();
     }
 
     @Override

@@ -21,7 +21,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_marginTop="4dp"
-            android:text="Amount"
+            android:text="@string/amount"
             android:textColor="#80000000" />
 
 
@@ -41,7 +41,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/Amount"
             android:layout_marginTop="18dp"
-            android:text="Start Date"
+            android:text="@string/startDate"
             android:textColor="#80000000" />
 
 
@@ -51,7 +51,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/startDateTextview"
             android:layout_toRightOf="@+id/startDate"
-            android:text="Select"
+            android:text="@string/Select"
 
             />
 
@@ -62,7 +62,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/startDateTextview"
             android:layout_marginTop="4dp"
-            android:text="Choose Start Date"
+            android:text="@string/chooseStartDate"
             android:textColor="#000000" />
 
         <TextView
@@ -71,7 +71,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/startDate"
             android:layout_marginTop="18dp"
-            android:text="End Date"
+            android:text="@string/endDate"
             android:textColor="#80000000" />
 
 
@@ -82,7 +82,7 @@
             android:layout_below="@+id/endDateTextView"
             android:layout_toRightOf="@+id/endDate"
             android:inputType="none"
-            android:text="Select" />
+            android:text="@string/select" />
 
 
         <TextView
@@ -91,7 +91,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/endDateTextView"
             android:layout_marginTop="4dp"
-            android:text="Optional End Date"
+            android:text="@string/optionalEndDate"
             android:textColor="#000000" />
 
 
@@ -101,7 +101,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/endDate"
             android:layout_marginTop="4dp"
-            android:text="Interval"
+            android:text="@string/interval"
             android:textColor="#80000000" />
 
         <Spinner

@@ -60,7 +60,7 @@ public class JoinHouse extends AppCompatActivity {
             }
         });
 
-        welcomeMessage.append(" " + current + "\nYou aren't a member of any houses, please select an option to join one");
+        welcomeMessage.append(" " + current.getName() + "\nYou aren't a member of any houses, please select an option to join one");
 
     }
 }

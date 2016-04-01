@@ -3,9 +3,7 @@ package itt.matthew.houseshare.Activities;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.PointF;
 import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -18,32 +16,19 @@ import android.support.v7.graphics.Palette;
 import android.util.AttributeSet;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.afollestad.materialdialogs.MaterialDialog;
-import com.afollestad.materialdialogs.color.ColorChooserDialog;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
-import org.json.JSONObject;
-
 import itt.matthew.houseshare.Fragments.FinanceFragment;
-import itt.matthew.houseshare.Fragments.PersonalCostsFragment;
-import itt.matthew.houseshare.Fragments.TasksFragment;
 import itt.matthew.houseshare.Fragments.color_dialog;
 import itt.matthew.houseshare.Models.Account;
 import itt.matthew.houseshare.Models.House;
 import itt.matthew.houseshare.R;
-import jp.wasabeef.picasso.transformations.BlurTransformation;
-import jp.wasabeef.picasso.transformations.ColorFilterTransformation;
-import jp.wasabeef.picasso.transformations.CropCircleTransformation;
-import jp.wasabeef.picasso.transformations.gpu.KuwaharaFilterTransformation;
-import jp.wasabeef.picasso.transformations.gpu.VignetteFilterTransformation;
 
 public class AccountActivity extends AppCompatActivity implements AppBarLayout.OnOffsetChangedListener{
 
@@ -234,7 +219,7 @@ public class AccountActivity extends AppCompatActivity implements AppBarLayout.O
         @Override
         public Fragment getItem(int i) {
             switch(i) {
-                case 0: return PersonalCostsFragment.newInstance("Test", "Test");
+                case 0: return FinanceFragment.newInstance("Test", "Test");
                 case 1: return color_dialog.newInstance("Test", "Test");
 
             }
@@ -249,12 +234,6 @@ public class AccountActivity extends AppCompatActivity implements AppBarLayout.O
             }
             return "";
         }
-    }
-
-    private void populateImage(){
-
-        Picasso.with(this).load(imageLocation).into(backdrop);
-
     }
 
     @Override

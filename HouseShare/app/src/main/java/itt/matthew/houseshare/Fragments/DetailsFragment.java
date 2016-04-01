@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -52,6 +53,8 @@ public class DetailsFragment extends Fragment{
     private House house;
     private GridView gridView;
 
+    private float x1,x2;
+    static final int MIN_DISTANCE = 150;
 
     public static final String SHAREDPREFFILE = "temp";
     public static final String USERIDPREF = "uid";
@@ -98,6 +101,7 @@ public class DetailsFragment extends Fragment{
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
+
 
 
 
