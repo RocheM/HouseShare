@@ -62,11 +62,10 @@ public class OverviewAdapter extends RecyclerView.Adapter<OverviewAdapter.OverVi
 
         DateFormat formatter = DateFormat.getDateInstance(DateFormat.SHORT);
 
-        holder.name.setText(house.getMembers().get(position).getName());
+        holder.name.setText(cost.getSplit().get(position).getName());
         holder.date.setText("Next Payment:" + formatter.format(getNextDate(cost).getTime()));
-        Picasso.with(ctx).load("http://graph.facebook.com/"+house.getMembers().get(position).getFacebookID()+"/picture?type=large").into(holder.picture);
+        Picasso.with(ctx).load("http://graph.facebook.com/"+cost.getSplit().get(position).getUserFacebookID()+"/picture?type=large").placeholder(R.mipmap.placeholder_person).into(holder.picture);
         holder.bind(holder.card, position, listener);
-
     }
 
 
@@ -100,7 +99,7 @@ public class OverviewAdapter extends RecyclerView.Adapter<OverviewAdapter.OverVi
 
     @Override
     public int getItemCount() {
-        return house.getMembers().size();
+        return cost.getSplit().size();
     }
 
     public static class OverViewholder extends RecyclerView.ViewHolder {

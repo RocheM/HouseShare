@@ -23,6 +23,7 @@ import com.microsoft.windowsazure.mobileservices.table.TableQueryCallback;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import itt.matthew.houseshare.Models.Account;
@@ -93,6 +94,12 @@ public class GroupCreate extends AppCompatActivity {
                 ArrayList<Account> members = new ArrayList<Account>();
                 members.add(workingAccount);
                 toUp.setMembers(members);
+                toUp.setCreatedOn(Calendar.getInstance());
+                toUp.setFounder(workingAccount.getFacebookID());
+                ArrayList<String> operators = new ArrayList<String>();
+                operators.add(workingAccount.getFacebookID());
+                toUp.setOperators(operators);
+
 
                 setID(toUp);
 
@@ -112,18 +119,20 @@ public class GroupCreate extends AppCompatActivity {
 
     public void setID(final House item){
 
+
         mHouseTable.select("id").execute(new TableQueryCallback<House>() {
             @Override
             public void onCompleted(List<House> result, int count, Exception exception, ServiceFilterResponse response) {
                if (exception == null) {
-                       item.setHouseID(count + 1);
-                       getAccount(item);
+                       toUp.setHouseID(count + 1);
+                       getAccount(toUp);
                }
                 else
                    exception.printStackTrace();
             }
         });
     }
+
 
     public void getAccount(final House item){
 
@@ -138,6 +147,7 @@ public class GroupCreate extends AppCompatActivity {
         });
 
     }
+
 
 
 
@@ -167,12 +177,12 @@ public class GroupCreate extends AppCompatActivity {
             public void onCompleted(House entity, Exception exception, ServiceFilterResponse response) {
                 if (exception == null) {
 
-                  Intent i = new Intent(getApplicationContext(), MainActivity.class);
-                  Bundle b = new Bundle();
-                  b.putParcelable("House", toUp);
-                  b.putParcelable("Account", workingAccount);
-                  i.putExtra("Bundle", b);
-                  startActivity(i);
+                    Intent i = new Intent(getApplicationContext(), MainActivity.class);
+                    Bundle b = new Bundle();
+                    b.putParcelable("House", toUp);
+                    b.putParcelable("Account", workingAccount);
+                    i.putExtra("Bundle", b);
+                    startActivity(i);
 
                 } else {
 

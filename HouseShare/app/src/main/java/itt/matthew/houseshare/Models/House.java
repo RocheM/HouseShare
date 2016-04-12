@@ -14,9 +14,11 @@ import com.google.gson.reflect.TypeToken;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -32,6 +34,10 @@ public class House implements Parcelable {
     private String costCategories;
     private String name;
     private String description;
+    private String operators;
+    private long createdOn;
+    private String founder;
+    private String archivedCosts;
 
     public House (String name, String description){
 
@@ -41,6 +47,7 @@ public class House implements Parcelable {
         if (costCategories == null){
             setUpCostCategories();
         }
+        createdOn = Calendar.getInstance().getTimeInMillis();
     }
 
     public House (House toSet){
@@ -51,7 +58,13 @@ public class House implements Parcelable {
         this.HouseID = toSet.getHouseID();
         setCosts(toSet.getCost());
         setMembers(toSet.getMembers());
+        ArrayList<Account> members = toSet.getMembers();
+        setMembers(members);
         setCostCategories(toSet.getCostCategory());
+        setOperators(toSet.getOperators());
+        setCreatedOn(toSet.getCreatedOn());
+        setFounder(toSet.getFounder());
+        setArchivedCosts(toSet.getArchivedCosts());
     }
 
 
@@ -69,13 +82,59 @@ public class House implements Parcelable {
         categories.add(Electricity);
 
         ArrayList<Cost> costs = new ArrayList<Cost>();
-//        Calendar test = new GregorianCalendar();
-//        test = Calendar.getInstance();
-//        costs.add(new Cost(0, categories.get(0), 1.0, test, test));
+        ArrayList<Cost> archivedCosts = new ArrayList<Cost>();
 
         setCosts(costs);
+        setArchivedCosts(archivedCosts);
         setCostCategories(categories);
 
+
+    }
+
+
+    public ArrayList<String> getOperators() {
+
+        final Gson gson = new Gson();
+
+        JsonParser parser = new JsonParser();
+        JsonArray o = parser.parse(operators).getAsJsonArray();
+
+        ArrayList<String> toReturn = new ArrayList<String>();
+
+
+        for (int i = 0; i < o.size(); i++) {
+            toReturn.add(gson.fromJson(o.get(i), String.class));
+        }
+
+
+        return toReturn;
+    }
+
+    public void setOperators(ArrayList<String> operatorsList) {
+        final Gson gson = new Gson();
+
+        Type listOfTestObject = new TypeToken<ArrayList<String>>(){}.getType();
+       operators = gson.toJson(operatorsList, listOfTestObject);
+    }
+
+    public Calendar getCreatedOn() {
+
+        Calendar toReturn = new GregorianCalendar();
+        toReturn.setTimeInMillis(createdOn);
+
+        return toReturn;
+    }
+
+    public void setCreatedOn(Calendar createdOn) {
+        this.createdOn = createdOn.getTimeInMillis();
+    }
+
+    public String getFounder() {
+        return founder;
+    }
+
+    public void setFounder(String founder) {
+        this.founder = founder;
     }
 
     public House(Parcel in){
@@ -124,7 +183,6 @@ public class House implements Parcelable {
 
         ArrayList<Account> toReturn = new ArrayList<Account>();
 
-
         for (int i = 0; i < o.size(); i++) {
            toReturn.add(gson.fromJson(o.get(i), Account.class));
         }
@@ -171,7 +229,37 @@ public class House implements Parcelable {
 
         Type listOfTestObject = new TypeToken<ArrayList<Cost>>(){}.getType();
         costs = gson.toJson(toUpload, listOfTestObject);
+    }
 
+
+
+    public ArrayList<Cost> getArchivedCosts() { return getArchivedCostsFromJSON();}
+
+    private ArrayList<Cost> getArchivedCostsFromJSON(){
+
+        final Gson gson = new Gson();
+
+        JsonParser parser = new JsonParser();
+        JsonArray o = parser.parse(archivedCosts).getAsJsonArray();
+
+        ArrayList<Cost> toReturn = new ArrayList<Cost>();
+
+
+        for (int i = 0; i < o.size(); i++) {
+            toReturn.add(gson.fromJson(o.get(i), Cost.class));
+        }
+
+
+        return toReturn;
+    }
+
+
+    public void setArchivedCosts(ArrayList<Cost> toUpload){
+
+        final Gson gson = new Gson();
+
+        Type listOfTestObject = new TypeToken<ArrayList<Cost>>(){}.getType();
+        archivedCosts = gson.toJson(toUpload, listOfTestObject);
     }
 
 
@@ -224,10 +312,16 @@ public class House implements Parcelable {
         out.writeString(costCategories);
         out.writeString(name);
         out.writeString(description);
+        out.writeString(operators);
+        out.writeLong(createdOn);
+        out.writeString(founder);
+        out.writeString(archivedCosts);
+
     }
 
 
     private void readFromParcel(Parcel in) {
+
 
         ID = in.readString();
         HouseID = in.readInt();
@@ -236,6 +330,10 @@ public class House implements Parcelable {
         costCategories = in.readString();
         name = in.readString();
         description = in.readString();
+        operators = in.readString();
+        createdOn = in.readLong();
+        founder = in.readString();
+        archivedCosts = in.readString();
     }
 
     public static final Parcelable.Creator<House> CREATOR = new Parcelable.Creator<House>() {

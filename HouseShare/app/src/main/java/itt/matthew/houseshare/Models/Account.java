@@ -92,7 +92,6 @@ public class Account implements Parcelable {
         email = in.readString();
         coverPhotoURL = in.readString();
         houseID = in.readInt();
-
     }
 
         public static final Parcelable.Creator<Account> CREATOR = new Parcelable.Creator<Account>() {

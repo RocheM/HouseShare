@@ -60,4 +60,16 @@ Mauris nulla mauris, sollicitudin eu cursus ut, mollis id ex. Fusce consequat eg
     <string name="div">/</string>
     <string name="selectedColor">Selected Color</string>
     <string name="dueDate">Due Date</string>
+    <string name="DatesPaid">Dates Paid</string>
+    <string name="login">Login</string>
+    <string name="welcomeToHouseShare">Welcome to HouseShare</string>
+    <string name="pleaseLogIn">Please Log In</string>
+    <string name="paid">Paid</string>
+    <string name="unpaid">Unpaid</string>
+    <string name="overdue">Overdue</string>
+    <string name="houseDescription">House Description</string>
+    <string name="info">info</string>
+    <string name="houseName">House Name</string>
+    <string name="confirm">Confirm</string>
+    <string name="cancel">Cancel</string>
 </resources>

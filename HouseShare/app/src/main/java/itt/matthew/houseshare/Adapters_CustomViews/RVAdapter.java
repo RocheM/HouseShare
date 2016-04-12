@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.greenrobot.eventbus.EventBus;
 import org.w3c.dom.Text;
 
 import java.security.AccessControlContext;
@@ -27,8 +28,12 @@ import java.util.Date;
 import java.util.Locale;
 
 import itt.matthew.houseshare.Activities.CostDetails;
+import itt.matthew.houseshare.Events.LongPressEvent;
+import itt.matthew.houseshare.Fragments.CostOverviewFragment;
+import itt.matthew.houseshare.Fragments.FinanceFragment;
 import itt.matthew.houseshare.Models.Account;
 import itt.matthew.houseshare.Models.Cost;
+import itt.matthew.houseshare.Models.CostSplit;
 import itt.matthew.houseshare.Models.House;
 import itt.matthew.houseshare.R;
 
@@ -36,8 +41,12 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.PersonViewHolder> 
 
 
     private House persons;
-    private RecyclerView recyclerView;
     private Account account;
+    private boolean personal;
+    private boolean archive;
+    private ArrayList<Cost> personalCosts;
+    private ArrayList<Cost> costs;
+    private FinanceFragment.OnItemTouchListener touchListener;
 
     public static class PersonViewHolder extends RecyclerView.ViewHolder {
         private CardView cv;
@@ -46,9 +55,28 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.PersonViewHolder> 
         private TextView CostInterval;
         private TextView CostAmount;
         private ImageView CostColor;
-        private int currentItem;
-        private House house;
-        private Account acc;
+
+
+
+        private void bind(final View item, final int position,  final FinanceFragment.OnItemTouchListener  listener) {
+
+            item.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    listener.onItemViewTouch(item, position);
+                }
+            });
+
+            item.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    listener.onItemHeld(item, position);
+                    return true;
+                }
+            });
+        }
+
+
 
 
         PersonViewHolder(View itemView) {
@@ -61,33 +89,71 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.PersonViewHolder> 
             CostAmount = (TextView) itemView.findViewById(R.id.cost_amount);
             CostColor = (ImageView)itemView.findViewById(R.id.color_code);
 
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
 
-                    Intent i = new Intent(v.getContext(), CostDetails.class);
-                    Bundle b = new Bundle();
-                    b.putParcelable("house", house);
-                    b.putParcelable("account", acc);
-                    b.putInt("cost", currentItem);
-                    i.putExtra("extra", b);
-                    v.getContext().startActivity(i);
-                }
-            });
+
+//            itemView.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//
+//                    Intent i = new Intent(v.getContext(), CostDetails.class);
+//                    Bundle b = new Bundle();
+//                    b.putParcelable("house", );
+//                    b.putParcelable("account", acc);
+//                    b.putInt("cost", currentItem);
+//                    i.putExtra("extra", b);
+//                    v.getContext().startActivity(i);
+//                }
+//            });
+//
+//            itemView.setOnLongClickListener(new View.OnLongClickListener() {
+//                @Override
+//                public boolean onLongClick(View v) {
+//                    EventBus.getDefault().post(new LongPressEvent(acc, house.getCost().get(currentItem), currentItem));
+//                    return true;
+//                }
+//            });
         }
     }
 
-    public RVAdapter(House persons, Account account){
+
+    public RVAdapter(House persons, Account account, boolean personal, FinanceFragment.OnItemTouchListener touchListener){
         this.persons = new House(persons);
         this.account = account;
+        this.personal = personal;
+        this.costs = persons.getCost();
+        this.touchListener = touchListener;
+
+
+
+        if(personal){
+            personalCosts = new ArrayList<>();
+
+
+            for (int i = 0; i < costs.size(); i++){
+                ArrayList<CostSplit> costSplits = costs.get(i).getSplit();
+                for(int j = 0; j < costSplits.size(); j++){
+                    if (account.getFacebookID().equals(costSplits.get(j).getUserFacebookID())){
+                        personalCosts.add(costs.get(i));
+                    }
+                }
+            }
+        }
 
     }
+
+
 
 
     @Override
     public int getItemCount() {
-        return persons.getCost().size();
+
+        if (personal ) {
+            return personalCosts.size();
+        } else
+            return costs.size();
     }
+
+
 
 
     @Override
@@ -100,23 +166,39 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.PersonViewHolder> 
     @Override
     public void onBindViewHolder(PersonViewHolder personViewHolder, int i) {
 
-        ArrayList<Cost> costs = persons.getCost();
-        personViewHolder.house = new House(persons);
-        personViewHolder.acc = account;
-        DateFormat formatter = DateFormat.getDateInstance(DateFormat.SHORT);
-        NumberFormat format = NumberFormat.getCurrencyInstance(Locale.GERMANY);
+
+        if (!personal){
+
+            DateFormat formatter = DateFormat.getDateInstance(DateFormat.SHORT);
+            NumberFormat format = NumberFormat.getCurrencyInstance(Locale.GERMANY);
 
 
-        personViewHolder.CostCategory.setText(costs.get(i).getCategory().getName());
-        personViewHolder.CostCategory.setTextColor(costs.get(i).getCategory().getColor());
-        personViewHolder.CostDate.setText(formatter.format(costs.get(i).getStartDate().getTime()) + " to " + formatter.format(costs.get(i).getEndDate().getTime()));
-        personViewHolder.CostInterval.setText("Next payment: " + formatter.format(getNextDate(costs.get(i)).getTime()));
-        personViewHolder.CostAmount.setText(format.format(costs.get(i).getAmount()));
-        personViewHolder.CostColor.setBackgroundColor(costs.get(i).getCategory().getColor());
+            personViewHolder.CostCategory.setText(costs.get(i).getCategory().getName());
+            personViewHolder.CostCategory.setTextColor(costs.get(i).getCategory().getColor());
+            personViewHolder.CostDate.setText(formatter.format(costs.get(i).getStartDate().getTime()) + " to " + formatter.format(costs.get(i).getEndDate().getTime()));
+            personViewHolder.CostInterval.setText("Next payment: " + formatter.format(getNextDate(costs.get(i)).getTime()));
+            personViewHolder.CostAmount.setText(format.format(costs.get(i).getAmount()));
+            personViewHolder.CostColor.setBackgroundColor(costs.get(i).getCategory().getColor());
 
 
-        personViewHolder.currentItem = i;
+            personViewHolder.bind(personViewHolder.cv, i, touchListener);
+        }else{
 
+
+            DateFormat formatter = DateFormat.getDateInstance(DateFormat.SHORT);
+            NumberFormat format = NumberFormat.getCurrencyInstance(Locale.GERMANY);
+
+
+            personViewHolder.CostCategory.setText(personalCosts.get(i).getCategory().getName());
+            personViewHolder.CostCategory.setTextColor(personalCosts.get(i).getCategory().getColor());
+            personViewHolder.CostDate.setText(formatter.format(personalCosts.get(i).getStartDate().getTime()) + " to " + formatter.format(personalCosts.get(i).getEndDate().getTime()));
+            personViewHolder.CostInterval.setText("Next payment: " + formatter.format(getNextDate(personalCosts.get(i)).getTime()));
+            personViewHolder.CostAmount.setText(format.format(personalCosts.get(i).getAmount()));
+            personViewHolder.CostColor.setBackgroundColor(personalCosts.get(i).getCategory().getColor());
+
+            personViewHolder.bind(personViewHolder.cv, i, touchListener);
+
+        }
     }
 
     private Date getNextDate(Cost c){
@@ -131,18 +213,30 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.PersonViewHolder> 
             }
         }
 
-        int small = results.get(0);
-        int index = 0;
+        int small = 0;
+        if (results.size() == 0) {
 
-        for (int i = 0; i < results.size(); i++) {
-            if (results.get(i) < small) {
-                small = results.get(i);
-                index = i;
-            }
+            Calendar d = Calendar.getInstance();
+            d.add(Calendar.DATE, c.getInterval());
+
+
+            return d.getTime();
+
         }
+        else {
 
+            small = results.get(0);
+            int index = 0;
 
-        return c.getIntervals().get(index).getDate().getTime();
+            for (int i = 0; i < results.size(); i++) {
+                if (results.get(i) < small) {
+                    small = results.get(i);
+                    index = i;
+                }
+            }
+            return c.getIntervals().get(index).getDate().getTime();
+
+        }
     }
 
     @Override

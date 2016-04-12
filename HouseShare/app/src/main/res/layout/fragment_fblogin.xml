@@ -15,11 +15,12 @@
         android:id="@+id/FB_Login"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="45dp"
-        android:text="Login"
+        android:layout_marginTop="10dp"
+        android:text="@string/login"
         android:background="@color/colorPrimaryDark"
         android:textColor="@color/white"
         android:layout_below="@+id/plog"
+        android:textAppearance="@android:style/TextAppearance.Large"
         />
 
     <ImageView
@@ -35,7 +36,7 @@
         android:id="@+id/Welcome"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Welcome to HouseShare"
+        android:text="@string/welcomeToHouseShare"
         android:textColor="@color/colorPrimary"
         android:layout_centerHorizontal="true"
         android:layout_below="@id/login"
@@ -46,7 +47,7 @@
         android:id="@+id/plog"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Please Log In"
+        android:text="@string/pleaseLogIn"
         android:textColor="@color/colorPrimary"
         android:layout_centerHorizontal="true"
         android:layout_below="@+id/Welcome"

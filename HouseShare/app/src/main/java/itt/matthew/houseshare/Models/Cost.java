@@ -52,7 +52,7 @@ public class Cost {
 
             Calendar cal = Calendar.getInstance();
             cal.setTime(temp);
-            cal.add(Calendar.DATE, interval); // add 10 days
+            cal.add(Calendar.DATE, interval); // add interval days
 
             ArrayList<Pair<String, Boolean>> instances;
             instances = new ArrayList<>();
@@ -65,13 +65,16 @@ public class Cost {
             }
 
 
-            intervals.add(new CostInstance(cal, instances));
 
 
             count ++;
-            if(cal.after(EndDate) || cal.equals(EndDate) || count > 15) {
+            if(cal.after(EndDate)) {
                 cont = true;
             }
+            else
+                intervals.add(new CostInstance(cal, instances));
+
+
 
             temp = cal.getTime();
 

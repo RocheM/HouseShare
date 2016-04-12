@@ -1,13 +1,16 @@
 package itt.matthew.houseshare.Fragments;
 
 
+import android.app.Activity;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 import org.greenrobot.eventbus.Subscribe;
 
@@ -56,6 +59,8 @@ public class CostOverviewFragment extends Fragment {
             }
         };
 
+
+
         RecyclerView rv = (RecyclerView) getView().findViewById(R.id.cost_overview_rv);
         rv.setLayoutManager(new LinearLayoutManager(this.getContext()));
         rv.setAdapter(new OverviewAdapter(house, current, getActivity().getApplicationContext(), cost, itemTouchListener));
@@ -82,7 +87,7 @@ public class CostOverviewFragment extends Fragment {
 
 
     public interface OnItemTouchListener {
-        public void onCardViewTouch(View view, int position);
+        void onCardViewTouch(View view, int position);
     }
 
 

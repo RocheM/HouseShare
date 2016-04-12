@@ -15,9 +15,11 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.telephony.PhoneNumberUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -93,6 +95,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     String TITLES[] = {"Home","Finance", "Tasks"};
     int ICONS[] = {R.drawable.ic_home_24dp, R.drawable.ic_local_atm_24dp,R.drawable.ic_insert_invitation_24dp};
     private  OnItemTouchListener listener;
+    private int color;
 
     //Similarly we Create a String Resource for the name and email in the header view
     //And we also create a int resource for profile picture in the header view
@@ -104,41 +107,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         org.greenrobot.eventbus.EventBus.getDefault().register(this);
     }
 
-    @Override
-    public boolean onTouchEvent(MotionEvent event)
-    {
-        switch(event.getAction())
-        {
-            case MotionEvent.ACTION_DOWN:
-                x1 = event.getX();
-                break;
-            case MotionEvent.ACTION_UP:
-                x2 = event.getX();
-                float deltaX = x2 - x1;
-
-                if (Math.abs(deltaX) > MIN_DISTANCE)
-                {
-                    // Left to Right swipe action
-                    if (x2 > x1)
-                    {
-                        Toast.makeText(this, "Left to Right swipe [Next]", Toast.LENGTH_SHORT).show ();
-                    }
-
-                    // Right to left swipe action
-                    else
-                    {
-                        Toast.makeText(this, "Right to Left swipe [Previous]", Toast.LENGTH_SHORT).show ();
-                    }
-
-                }
-                else
-                {
-                    // consider as something else - a screen tap for example
-                }
-                break;
-        }
-        return super.onTouchEvent(event);
-    }
 
     @Override
     public void onStop() {
@@ -229,6 +197,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         mAdapter = new DrawerAdapter(TITLES,ICONS,current,this, listener);
         mRecyclerView = (RecyclerView) findViewById(R.id.nav_rv); // Assigning the RecyclerView Object to the xml View
 
+        assert mRecyclerView != null;
         mRecyclerView.setHasFixedSize(true);
 
         mRecyclerView.setAdapter(mAdapter);                              // Setting the adapter to RecyclerView
@@ -238,20 +207,26 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         mRecyclerView.setLayoutManager(mLayoutManager);                 // Setting the layout Manager
 
 
+
         Drawer = (DrawerLayout) findViewById(R.id.DrawerLayout);        // Drawer object Assigned to the view
         mDrawerToggle = new ActionBarDrawerToggle(this,Drawer,toolbar,R.string.open_drawer,R.string.close_drawer){
 
             @Override
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
-                // code here will execute once the drawer is opened( As I dont want anything happened whe drawer is
-                // open I am not going to put anything here)
+
+                if (color != 0) {
+                    window.setStatusBarColor(color);
+                }
+
             }
 
             @Override
             public void onDrawerClosed(View drawerView) {
                 super.onDrawerClosed(drawerView);
-                // Code here will execute once drawer is closed
+
+                window.setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark));
+
             }
 
 
@@ -266,6 +241,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         setupAccount();
         loadSelection(0);
+        loadBitmap(current.getCoverPhotoURL());
     }
 
 
@@ -298,6 +274,24 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     public void handleLoadedBitmap(Bitmap b) {
 
+        Palette.from(b).generate(new Palette.PaletteAsyncListener() {
+            public void onGenerated(Palette p) {
+
+                if (p.getDarkVibrantColor(getResources().getColor(R.color.colorPrimaryDark)) == getResources().getColor(R.color.colorPrimaryDark)) {
+
+                    color = p.getMutedColor((getResources().getColor(R.color.colorPrimaryDark)));
+
+                } else if (p.getMutedColor(getResources().getColor(R.color.colorPrimaryDark)) == getResources().getColor(R.color.colorPrimaryDark)) {
+
+                    color = p.getDarkVibrantColor(getResources().getColor(R.color.colorPrimaryDark));
+
+                } else {
+
+                    color = p.getVibrantColor(getResources().getColor(R.color.colorPrimaryDark));
+                }
+
+            }
+        });
 
     }
 
@@ -329,6 +323,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         startActivity(i);
     }
 
+    private void startHouseSettingsActivity(){
+
+        Intent i = new Intent(this, HouseSettingsActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("house", house);
+        bundle.putParcelable("account", current);
+        i.putExtra("extra", bundle);
+        startActivity(i);
+
+    }
+
 
 
     private void loadSelection(int i){
@@ -356,6 +361,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 Bundle b = new Bundle();
                 b.putParcelable("house", house);
                 b.putParcelable("account", current);
+                b.putBoolean("personal", false);
                 getIntent().putExtra("extra", b);
                 fragmentTransaction.replace(R.id.fragmentHolder, financeFragment);
                 fragmentTransaction.addToBackStack(financeFragment.getTag());
@@ -382,17 +388,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
 
-        int id = item.getItemId();
-//
-//        if (id == android.R.id.home){
-//            if (drawerLayout.isDrawerOpen(navList)){
-//                drawerLayout.closeDrawer(navList);
-//            }else
-//                drawerLayout.openDrawer(navList);
-//        }
+        if(item.getTitle().equals("Account Settings")){
+            Toast.makeText(this,"Account Settings",Toast.LENGTH_SHORT).show();
+        }else if (item.getTitle().equals("House Settings")){
+            startHouseSettingsActivity();
+        }
+
 
         return super.onOptionsItemSelected(item);
     }
+
 
     private void setupAzure(){
 
@@ -543,7 +548,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     public interface OnItemTouchListener {
-        public void onItemViewTouch(View view, int position);
+        void onItemViewTouch(View view, int position);
 
     }
 }

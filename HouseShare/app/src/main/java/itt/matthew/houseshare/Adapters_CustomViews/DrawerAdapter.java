@@ -144,7 +144,7 @@ public class DrawerAdapter extends RecyclerView.Adapter<DrawerAdapter.ViewHolder
         }
         else{
 
-            Picasso.with(holder.itemView.getContext()).load("https://graph.facebook.com/" + current.getFacebookID() + "/picture?type=large").into(holder.profile);           // Similarly we set the resources for header view
+            Picasso.with(holder.itemView.getContext()).load("https://graph.facebook.com/" + current.getFacebookID() + "/picture?type=large").placeholder(R.mipmap.placeholder_person).into(holder.profile);           // Similarly we set the resources for header view
             Picasso.with(holder.itemView.getContext()).load(current.getCoverPhotoURL()).into(holder.navBackdrop);
             holder.Name.setText(current.getName());
             holder.email.setText(current.getEmail());

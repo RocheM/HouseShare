@@ -19,7 +19,7 @@ import itt.matthew.houseshare.R;
 
 public class MyHandler extends NotificationsHandler {
 
-    public static final int NOTIFICATION_ID = 1;
+    public static final int NOTIFICATION_ID = 0;
 
 
     @Override

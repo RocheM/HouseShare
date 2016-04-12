@@ -166,6 +166,7 @@ public class joinExisting extends AppCompatActivity {
         i.putExtra("Bundle", b);
 
         startActivity(i);
+        finish();
 
     }
 

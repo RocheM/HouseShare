@@ -12,8 +12,6 @@ import itt.matthew.houseshare.R;
 
 public class JoinHouse extends AppCompatActivity {
 
-    private TextView welcomeMessage;
-    private Button createHouseButton, joinHouseButton;
     private Account current;
 
     @Override
@@ -35,31 +33,36 @@ public class JoinHouse extends AppCompatActivity {
 
     private void setupUI(){
 
-        welcomeMessage = (TextView) findViewById(R.id.joinHouseWelcome);
-        createHouseButton = (Button) findViewById(R.id.createHouseButton);
+        TextView welcomeMessage = (TextView) findViewById(R.id.joinHouseWelcome);
+        Button createHouseButton = (Button) findViewById(R.id.createHouseButton);
+        assert createHouseButton != null;
         createHouseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(getApplicationContext(),GroupCreate.class);
+                Intent i = new Intent(getApplicationContext(), GroupCreate.class);
                 Bundle b = new Bundle();
                 b.putParcelable("Account", current);
                 i.putExtra("Bundle", b);
                 startActivity(i);
+                finish();
             }
         });
 
-        joinHouseButton = (Button) findViewById(R.id.joinExistingHouseButton);
+        Button joinHouseButton = (Button) findViewById(R.id.joinExistingHouseButton);
+        assert joinHouseButton != null;
         joinHouseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(getApplicationContext(),joinExisting.class);
+                Intent i = new Intent(getApplicationContext(), joinExisting.class);
                 Bundle b = new Bundle();
                 b.putParcelable("Account", current);
                 i.putExtra("Bundle", b);
                 startActivity(i);
+                finish();
             }
         });
 
+        assert welcomeMessage != null;
         welcomeMessage.append(" " + current.getName() + "\nYou aren't a member of any houses, please select an option to join one");
 
     }

@@ -329,12 +329,12 @@ public class CostSplitFragment extends Fragment {
     }
 
     public interface onDialogSeekBarChanged {
-        public void onSeekBarChanged(View view, int position, double amount);
+        void onSeekBarChanged(View view, int position, double amount);
     }
 
     public interface OnItemTouchListener {
-        public void onCardViewTouch(View view, int position);
-        public void onCheckViewTouch(View view, int position);
+        void onCardViewTouch(View view, int position);
+        void onCheckViewTouch(View view, int position);
 
     }
 }

@@ -83,6 +83,12 @@ public class AccountActivity extends AppCompatActivity implements AppBarLayout.O
         Bundle extras = this.getIntent().getBundleExtra("extra");
         account = extras.getParcelable("account");
         house = extras.getParcelable("house");
+
+        Bundle b = new Bundle();
+        b.putParcelable("house", house);
+        b.putParcelable("account", account);
+        b.putBoolean("personal", true);
+        getIntent().putExtra("extra", b);
     }
 
     private void setupUI() {

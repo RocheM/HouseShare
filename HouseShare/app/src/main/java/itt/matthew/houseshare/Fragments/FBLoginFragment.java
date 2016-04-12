@@ -178,6 +178,7 @@ public class FBLoginFragment extends Fragment {
         i.putExtra("Bundle", b);
 
         startActivity(i);
+        getActivity().finish();
     }
 
     public void startMainActivity(Account acc) {
@@ -187,6 +188,7 @@ public class FBLoginFragment extends Fragment {
         b.putParcelable("Account", acc);
         i.putExtra("Bundle", b);
         startActivity(i);
+        getActivity().finish();
 
     }
 

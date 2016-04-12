@@ -19,10 +19,12 @@
             android:layout_height="200dp"
             app:contentScrim="?attr/colorPrimaryDark"
             app:expandedTitleMarginStart="48dp"
-            app:expandedTitleMarginEnd="64dp"
+
             app:layout_scrollFlags="scroll|snap"
             >
-            <!--​-->
+
+            <!--app:expandedTitleMarginEnd="64dp"-->
+
             <ImageView
                 android:id="@+id/profile_backdrop"
                 android:layout_width="match_parent"
