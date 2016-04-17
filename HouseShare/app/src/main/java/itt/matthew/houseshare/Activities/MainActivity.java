@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     static final int MIN_DISTANCE = 150;
 
     String TITLES[] = {"Home","Finance", "Tasks"};
-    int ICONS[] = {R.drawable.ic_home_24dp, R.drawable.ic_local_atm_24dp,R.drawable.ic_insert_invitation_24dp};
+    int ICONS[] = {R.drawable.ic_home_24dp, R.drawable.ic_insert_drive_file_black_24dp,R.drawable.ic_assignment_black_24dp1};
     private  OnItemTouchListener listener;
     private int color;
 
@@ -156,6 +156,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             bundle.putParcelable("house", house);
 
             startCostActivity(bundle);
+        } else if (event.getRequestFlag() == 't'){
+
+            Bundle bundle = new Bundle();
+            bundle.putParcelable("account", current);
+            bundle.putParcelable("house", house);
+
+            startTaskActivity(bundle);
         }
         else if (event.getRequestFlag() == 'f')
             org.greenrobot.eventbus.EventBus.getDefault().post(new ReplyEvent(house, current));
@@ -319,6 +326,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private void startCostActivity(Bundle b){
 
         Intent i = new Intent(this, NewCost.class);
+        i.putExtra("extra", b);
+        startActivity(i);
+    }
+
+
+    private void startTaskActivity(Bundle b){
+
+        Intent i = new Intent(this, NewTask.class);
         i.putExtra("extra", b);
         startActivity(i);
     }

@@ -1,17 +1,24 @@
 package itt.matthew.houseshare.Fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v4.app.BundleCompat;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
+import itt.matthew.houseshare.Activities.NewCost;
+import itt.matthew.houseshare.Activities.NewTask;
 import itt.matthew.houseshare.Events.MessageEvent;
+import itt.matthew.houseshare.Events.RequestDetailsEvent;
 import itt.matthew.houseshare.Events.UpdateAccountEvent;
 import itt.matthew.houseshare.Models.Account;
 import itt.matthew.houseshare.Models.House;
@@ -57,6 +64,10 @@ public class TasksFragment extends Fragment  {
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
+
+            Bundle extra = getActivity().getIntent().getExtras().getBundle("extra");
+            current= extra.getParcelable("account");
+            house = extra.getParcelable("house");
         }
     }
 
@@ -65,6 +76,40 @@ public class TasksFragment extends Fragment  {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_tasks, container, false);
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+
+        setupUI();
+        super.onViewCreated(view, savedInstanceState);
+    }
+
+    private void setupUI(){
+
+        com.getbase.floatingactionbutton.FloatingActionButton fab = (com.getbase.floatingactionbutton.FloatingActionButton) getView().findViewById(R.id.tasks_action_a);
+        fab.setTitle("New Task");
+        fab.setIcon(R.drawable.ic_assignment_black_24dp);
+
+        com.getbase.floatingactionbutton.FloatingActionButton fab2 = (com.getbase.floatingactionbutton.FloatingActionButton) getView().findViewById(R.id.tasks_action_b);
+        fab2.setTitle("View Archive");
+        fab2.setIcon(R.drawable.ic_assignment_turned_in_black_24dp);
+
+
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                EventBus.getDefault().post(new RequestDetailsEvent('t'));
+            }
+        });
+
+        fab2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getContext(), "TODO", Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     // TODO: Rename method, update argument and hook method into UI event

@@ -118,7 +118,7 @@ public class membersFragment extends Fragment {
 
 
         RecyclerView rv = (RecyclerView) getView().findViewById(R.id.members_rv);
-        rv.setAdapter(new MembersAdapter(house, moderators, itemTouchListener));
+        rv.setAdapter(new MembersAdapter(house, moderators, itemTouchListener, true));
         rv.setLayoutManager(new LinearLayoutManager(getContext()));
 
     }

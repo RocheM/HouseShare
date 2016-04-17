@@ -38,6 +38,8 @@ public class House implements Parcelable {
     private long createdOn;
     private String founder;
     private String archivedCosts;
+    private String tasks;
+    private String taskAreas;
 
     public House (String name, String description){
 
@@ -65,6 +67,8 @@ public class House implements Parcelable {
         setCreatedOn(toSet.getCreatedOn());
         setFounder(toSet.getFounder());
         setArchivedCosts(toSet.getArchivedCosts());
+        setTasks(toSet.getTask());
+        setTaskAreas(toSet.getTaskArea());
     }
 
 
@@ -83,10 +87,14 @@ public class House implements Parcelable {
 
         ArrayList<Cost> costs = new ArrayList<Cost>();
         ArrayList<Cost> archivedCosts = new ArrayList<Cost>();
+        ArrayList<Task> tasks = new ArrayList<>();
+        ArrayList<TaskArea> taskAreas = new ArrayList<>();
 
         setCosts(costs);
         setArchivedCosts(archivedCosts);
         setCostCategories(categories);
+        setTasks(tasks);
+        setTaskAreas(taskAreas);
 
 
     }
@@ -233,6 +241,38 @@ public class House implements Parcelable {
 
 
 
+
+    public ArrayList<Task> getTask() { return getTaskFromJSON();}
+
+
+    private ArrayList<Task> getTaskFromJSON(){
+
+        final Gson gson = new Gson();
+
+        JsonParser parser = new JsonParser();
+        JsonArray o = parser.parse(tasks).getAsJsonArray();
+
+        ArrayList<Task> toReturn = new ArrayList<Task>();
+
+
+        for (int i = 0; i < o.size(); i++) {
+            toReturn.add(gson.fromJson(o.get(i), Task.class));
+        }
+
+
+        return toReturn;
+    }
+
+
+    public void setTasks(ArrayList<Task> toUpload){
+
+        final Gson gson = new Gson();
+
+        Type listOfTestObject = new TypeToken<ArrayList<Cost>>(){}.getType();
+        tasks = gson.toJson(toUpload, listOfTestObject);
+    }
+
+
     public ArrayList<Cost> getArchivedCosts() { return getArchivedCostsFromJSON();}
 
     private ArrayList<Cost> getArchivedCostsFromJSON(){
@@ -295,6 +335,38 @@ public class House implements Parcelable {
     }
 
 
+    public ArrayList<TaskArea> getTaskArea() { return getTaskAreaFromJSON();}
+
+
+    private ArrayList<TaskArea> getTaskAreaFromJSON(){
+
+        final Gson gson = new Gson();
+
+        JsonParser parser = new JsonParser();
+        JsonArray o = parser.parse(taskAreas).getAsJsonArray();
+
+        ArrayList<TaskArea> toReturn = new ArrayList<TaskArea>();
+
+
+        for (int i = 0; i < o.size(); i++) {
+            toReturn.add(gson.fromJson(o.get(i), TaskArea.class));
+        }
+
+
+        return toReturn;
+    }
+
+
+    public void setTaskAreas(ArrayList<TaskArea> toUpload){
+
+        final Gson gson = new Gson();
+
+        Type listOfTestObject = new TypeToken<ArrayList<TaskArea>>(){}.getType();
+        taskAreas = gson.toJson(toUpload, listOfTestObject);
+
+    }
+
+
 
     @Override
     public int describeContents() {
@@ -316,6 +388,8 @@ public class House implements Parcelable {
         out.writeLong(createdOn);
         out.writeString(founder);
         out.writeString(archivedCosts);
+        out.writeString(tasks);
+        out.writeString(taskAreas);
 
     }
 
@@ -334,6 +408,8 @@ public class House implements Parcelable {
         createdOn = in.readLong();
         founder = in.readString();
         archivedCosts = in.readString();
+        tasks = in.readString();
+        taskAreas = in.readString();
     }
 
     public static final Parcelable.Creator<House> CREATOR = new Parcelable.Creator<House>() {

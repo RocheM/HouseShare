@@ -39,6 +39,7 @@ public class MembersAdapter extends RecyclerView.Adapter<MembersAdapter.MemberVi
     private membersFragment.OnItemTouchListener onItemTouchListener;
     private ArrayList<CostSplit> splits;
     private ArrayList<Integer> moderators;
+    private boolean showMods;
 
     public static class MemberViewHolder extends RecyclerView.ViewHolder {
 
@@ -70,17 +71,19 @@ public class MembersAdapter extends RecyclerView.Adapter<MembersAdapter.MemberVi
                 super(itemView);
 
 
-            cardView = (CardView)itemView.findViewById(R.id.house_settings_cv);
-            profilePic = (CircleImageView)itemView.findViewById(R.id.house_profile_image);
-            profileName = (TextView)itemView.findViewById(R.id.house_profile_name);
+                cardView = (CardView)itemView.findViewById(R.id.house_settings_cv);
+                profilePic = (CircleImageView)itemView.findViewById(R.id.house_profile_image);
+                profileName = (TextView)itemView.findViewById(R.id.house_profile_name);
 
         }
     }
 
-    public MembersAdapter (House persons, ArrayList<Integer> moderators,  membersFragment.OnItemTouchListener listener ){
+    public MembersAdapter (House persons, ArrayList<Integer> moderators,  membersFragment.OnItemTouchListener listener, boolean showMods ){
         this.persons = persons;
         this.moderators = moderators;
         this.onItemTouchListener = listener;
+        this.showMods = showMods;
+
 
 
 
@@ -106,7 +109,8 @@ public class MembersAdapter extends RecyclerView.Adapter<MembersAdapter.MemberVi
 
         memberViewHolder.profileName.setText(persons.getMembers().get(i).getName());
 
-        if(moderators.get(i).equals(1)){
+        if(moderators.get(i).equals(1) && showMods
+                ){
             memberViewHolder.profileName.append("\nAdministrator");
         }
 
