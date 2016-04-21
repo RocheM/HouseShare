@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="18dp"
+        android:layout_gravity="center_horizontal"
+        android:text="Category Name"
+        android:textColor="#80000000" />
+
+    <EditText
+        android:id="@+id/categoryNameInput"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:layout_gravity="center_horizontal"
+        android:textColor="#80000000" />
+
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal">
+
+    <TextView
+        android:id="@+id/dialog.category.textview"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_marginTop="18dp"
+        android:layout_margin="10dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:text="Category Color"
+        android:textColor="#80000000" />
+
+
+    <Button
+        android:id="@+id/colorButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="10dp"
+        android:text="Select"
+        android:layout_below="@+id/dialog.category.textview"/>
+
+
+
+    <TextView
+        android:id="@+id/dialog.color.preview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="18dp"
+        android:layout_margin="10dp"
+        android:layout_gravity="center_horizontal"
+        android:textColor="#80000000"
+        android:layout_toRightOf="@+id/dialog.category.textview"/>
+
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/color.preview"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_gravity="center_horizontal"
+        android:elevation="8dp"
+        android:layout_margin="10dp"
+        app:civ_border_width="1dp"
+        app:civ_border_color="#ff0d0d0d"
+        android:layout_below="@+id/dialog.color.preview"
+        android:layout_toRightOf="@+id/colorButton"/>
+
+    </RelativeLayout>
+
+</LinearLayout>

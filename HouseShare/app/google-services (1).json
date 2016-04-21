@@ -1,0 +1,43 @@
+{
+  "project_info": {
+    "project_id": "houseshare-1249",
+    "project_number": "18540511502",
+    "name": "HouseShare"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:18540511502:android:7fc04faadb8b6f78",
+        "client_id": "android:itt.matthew.houseshare",
+        "client_type": 1,
+        "android_client_info": {
+          "package_name": "itt.matthew.houseshare",
+          "certificate_hash": []
+        }
+      },
+      "oauth_client": [],
+      "api_key": [],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "cloud_messaging_service": {
+          "status": 2,
+          "apns_config": []
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "google_signin_service": {
+          "status": 1
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "client_info": [],
+  "ARTIFACT_VERSION": "1"
+}

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:icon="@drawable/ic_more_vert_24dp"
+        app:showAsAction="ifRoom"
+        android:title="@string/settings">
+        <menu>
+            <item
+                android:icon="@drawable/ic_person_24dp1"
+                android:id="@+id/Account_Setting"
+                android:title="@string/account_settings" />
+            <item
+                android:icon="@drawable/ic_home_24dp1"
+                android:id="@+id/House_Setting"
+                android:title="@string/house_settings" />
+        </menu>
+    </item>
+
+</menu>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/account.cv"
+    android:foreground="?android:attr/selectableItemBackground"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="10dp">
+
+
+    <RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/card.profile.image"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_alignParentLeft="true"
+            android:layout_margin="16dp"/>
+
+        <TextView
+            android:id="@+id/card.profile.name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@+id/card.profile.image"
+            android:textSize="30sp" />
+
+        <TextView
+            android:id="@+id/card.profile.amount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/card.profile.name"
+            android:layout_toRightOf="@+id/card.profile.image"/>
+
+
+        <SeekBar android:id="@+id/card.profile.seekbar"
+            android:max="100"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/card.profile.amount"
+            android:layout_toRightOf="@id/card.profile.image">
+        </SeekBar>
+
+    </RelativeLayout>
+
+</android.support.v7.widget.CardView>
