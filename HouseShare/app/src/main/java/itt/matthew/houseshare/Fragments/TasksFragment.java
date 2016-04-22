@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.BundleCompat;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +19,8 @@ import org.greenrobot.eventbus.Subscribe;
 
 import itt.matthew.houseshare.Activities.NewCost;
 import itt.matthew.houseshare.Activities.NewTask;
+import itt.matthew.houseshare.Adapters_CustomViews.RVAdapter;
+import itt.matthew.houseshare.Adapters_CustomViews.RVTasksAdapter;
 import itt.matthew.houseshare.Events.MessageEvent;
 import itt.matthew.houseshare.Events.RequestDetailsEvent;
 import itt.matthew.houseshare.Events.UpdateAccountEvent;
@@ -35,6 +39,10 @@ public class TasksFragment extends Fragment  {
     private String mParam2;
     private House house;
     private Account current;
+    private Boolean personal;
+    private RecyclerView mRecyclerView;
+    private LinearLayoutManager mLayoutManager;
+    private RVTasksAdapter adapter;
 
     public TasksFragment() {
         // Required empty public constructor
@@ -47,6 +55,7 @@ public class TasksFragment extends Fragment  {
         current = event.getAccount();
         house = event.getHouse();
     }
+
 
 
     public static TasksFragment newInstance(String param1, String param2) {
@@ -65,9 +74,6 @@ public class TasksFragment extends Fragment  {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
 
-            Bundle extra = getActivity().getIntent().getExtras().getBundle("extra");
-            current= extra.getParcelable("account");
-            house = extra.getParcelable("house");
         }
     }
 
@@ -81,8 +87,17 @@ public class TasksFragment extends Fragment  {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
 
+        setupData();
         setupUI();
         super.onViewCreated(view, savedInstanceState);
+    }
+
+    private void setupData() {
+
+        Bundle extra = getActivity().getIntent().getExtras().getBundle("extra");
+        current= extra.getParcelable("account");
+        house = extra.getParcelable("house");
+        personal = extra.getBoolean("personal");
     }
 
     private void setupUI(){
@@ -91,10 +106,18 @@ public class TasksFragment extends Fragment  {
         fab.setTitle("New Task");
         fab.setIcon(R.drawable.ic_assignment_black_24dp);
 
-        com.getbase.floatingactionbutton.FloatingActionButton fab2 = (com.getbase.floatingactionbutton.FloatingActionButton) getView().findViewById(R.id.tasks_action_b);
-        fab2.setTitle("View Archive");
-        fab2.setIcon(R.drawable.ic_assignment_turned_in_black_24dp);
 
+        FinanceFragment.OnItemTouchListener onItemTouchListener = new FinanceFragment.OnItemTouchListener() {
+            @Override
+            public void onItemViewTouch(View view, int position) {
+
+            }
+
+            @Override
+            public void onItemHeld(View view, int position) {
+
+            }
+        };
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -104,12 +127,26 @@ public class TasksFragment extends Fragment  {
             }
         });
 
-        fab2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(getContext(), "TODO", Toast.LENGTH_LONG).show();
-            }
-        });
+
+
+        mRecyclerView = (RecyclerView) getView().findViewById(R.id.tasks_rv);
+
+        mLayoutManager = new LinearLayoutManager(getActivity());
+        mRecyclerView.setLayoutManager(mLayoutManager);
+
+
+        if (!personal){
+            mRecyclerView.setPadding(0, 150, 0, 0);
+        }
+
+
+        adapter = new RVTasksAdapter(house, current, personal, onItemTouchListener);
+
+        mRecyclerView.setAdapter(adapter);
+        mRecyclerView.setClickable(true);
+
+
+
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -133,14 +170,5 @@ public class TasksFragment extends Fragment  {
         super.onDetach();
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
+
 }

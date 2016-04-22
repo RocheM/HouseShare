@@ -8,10 +8,6 @@
         android:title="@string/settings">
         <menu>
             <item
-                android:icon="@drawable/ic_person_24dp1"
-                android:id="@+id/Account_Setting"
-                android:title="@string/account_settings" />
-            <item
                 android:icon="@drawable/ic_home_24dp1"
                 android:id="@+id/House_Setting"
                 android:title="@string/house_settings" />

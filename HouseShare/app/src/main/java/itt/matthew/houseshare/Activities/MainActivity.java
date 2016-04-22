@@ -386,6 +386,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 TasksFragment tasksFragment = new TasksFragment();
                 setTitle("House Tasks");
                 fragmentTransaction = fragmentManager.beginTransaction();
+                Bundle b2 = new Bundle();
+                b2.putParcelable("house", house);
+                b2.putParcelable("account", current);
+                b2.putBoolean("personal", false);
+                getIntent().putExtra("extra", b2);
                 fragmentTransaction.replace(R.id.fragmentHolder, tasksFragment);
                 fragmentTransaction.addToBackStack(tasksFragment.getTag());
                 fragmentTransaction.commit();

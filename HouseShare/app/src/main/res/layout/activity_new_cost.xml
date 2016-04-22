@@ -72,15 +72,6 @@
         />
 
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/cost.fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/activity_horizontal_margin"
-        app:layout_anchor="@id/costs.tabs"
-        app:layout_anchorGravity="bottom|right|end"
-        />
-
     <com.getbase.floatingactionbutton.FloatingActionsMenu
         android:id="@+id/cost.fab.menu"
         android:layout_width="wrap_content"

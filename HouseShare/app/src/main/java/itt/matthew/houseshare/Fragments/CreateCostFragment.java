@@ -59,7 +59,6 @@ public class CreateCostFragment extends Fragment {
     private Account account;
     private Cost WorkingCost = new Cost();
 
-    private ArrayList<String> CategoryStrings = new ArrayList<String>();
     private Spinner intervalSpinner, numberSpinner;
     private int interval = 1, intervalNumber = 1;
     private Button startDateButton, endDateButton;

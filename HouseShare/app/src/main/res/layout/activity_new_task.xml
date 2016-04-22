@@ -1,49 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:fab="http://schemas.android.com/apk/res-auto">
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
+    >
     ​
     <android.support.design.widget.AppBarLayout
         android:id="@+id/task.appbar"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="wrap_content"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         >
         ​
         <android.support.v7.widget.Toolbar
-            android:id="@+id/new.task.toolbar"
+            android:id="@+id/task.toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:minHeight="?attr/actionBarSize"
-            android:background="?colorPrimary"
+            app:theme="@style/ThemeOverlay.AppCompat.Light"
             app:layout_scrollFlags="scroll|enterAlways|snap"
             />
         ​
-        <RelativeLayout
+        <LinearLayout
+            android:id="@+id/task.title.container"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_scrollFlags="scroll|enterAlways|snap">
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            app:layout_scrollFlags="scroll|enterAlways|snap"
+            >
+
+            <TextView
+                android:id="@+id/task.CategoryTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_gravity="center_horizontal"
+                android:padding="5.5dp"
+                android:text="Category"
+                android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionBar.Title" />
 
 
-
-            <android.support.design.widget.TabLayout
-                android:id="@+id/task.tabs"
-                android:layout_width="fill_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:layout_alignParentBottom="true"
-                app:tabSelectedTextColor="?android:attr/textColorPrimaryInverse"
-                app:tabIndicatorColor="?android:attr/textColorPrimaryInverse"
-                app:tabIndicatorHeight="4dp"
+            <Spinner
+                android:id="@+id/task.CategorySpinner"
+                android:layout_width="wrap_content"
+                android:padding="5.5dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center_horizontal"
                 />
 
-
-        </RelativeLayout>
-
-
+            ​
+        </LinearLayout>
+        ​
+        <android.support.design.widget.TabLayout
+            android:id="@+id/task.tabs"
+            android:layout_width="fill_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/mdtp_light_gray"
+            app:tabSelectedTextColor="@color/white"
+            app:tabIndicatorColor="@color/white"
+            app:tabIndicatorHeight="4dp"
+            android:fillViewport="false" />
     </android.support.design.widget.AppBarLayout>
-
 
     <android.support.v4.view.ViewPager
         android:id="@+id/task.viewpager"
@@ -55,7 +74,7 @@
 
 
     <com.getbase.floatingactionbutton.FloatingActionsMenu
-        android:id="@+id/task.fab"
+        android:id="@+id/task.fab.menu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/activity_horizontal_margin"
@@ -71,22 +90,21 @@
         fab:fab_labelsPosition="left">
 
         <com.getbase.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab.tasks.actionA"
+            android:id="@+id/fab.task.actionA"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            fab:fab_title="Add New Category" />
+            fab:fab_title="Add New Area" />
 
 
         <com.getbase.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab.tasks.actionB"
+            android:id="@+id/fab.task.actionB"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            fab:fab_title="Add new User" />
+            fab:fab_title="Add People" />
+
 
     </com.getbase.floatingactionbutton.FloatingActionsMenu>
-    ​
 
-    ​​
     ​​
 </android.support.design.widget.CoordinatorLayout>
 

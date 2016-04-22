@@ -85,4 +85,17 @@ Mauris nulla mauris, sollicitudin eu cursus ut, mollis id ex. Fusce consequat eg
     <string name="enter_house_description">Enter House Description</string>
     <string name="create">Create</string>
     <string name="to_create_a_group_please_enter_a_name_and_description">To Create A Group Please Enter A Name and Description</string>
+    <string name="logo">Logo</string>
+    <string name="createNewArea">Create New Area</string>
+    <string name="enterName">Enter Name</string>
+    <string name="select_category_color">Select Category Color</string>
+    <string name="enter_description">Enter Description</string>
+    <string name="StartDateCannotBeBeforeCurrentDate">Start Date Cannot be before current Date</string>
+    <string name="endDateCannotBeOnOrBeforeStartDate">End Date Cannot be on or  before Start Date</string>
+    <string name="endDateCannotBeBeofreCurrentDate">End Date Cannot be before current Date</string>
+    <string name="updating">Updating</string>
+    <string name="updatingHouse">Updating House...</string>
+    <string name="createNewCost">Create New Cost</string>
+    <string name="createNewTask">Create New Task</string>
+    <string name="please_add_a_cost_to_get_started">Please Add A Cost To Get Started.</string>
 </resources>

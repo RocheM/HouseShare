@@ -36,6 +36,10 @@ public class MembersReorderAdapter extends RecyclerView.Adapter<MembersReorderAd
     private Context currentContext;
     private ArrayList<Account> members;
 
+    public ArrayList<Account> getMembers(){
+        return members;
+    }
+
     public interface OnDragStartListener {
         void onDragStarted(RecyclerView.ViewHolder viewHolder);
     }

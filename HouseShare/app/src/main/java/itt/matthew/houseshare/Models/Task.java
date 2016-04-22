@@ -30,8 +30,21 @@ public class Task {
         initalizeIntervals();
     }
 
+    public Task() {
 
-    private void  initalizeIntervals(){
+    }
+
+
+
+    public int getTaskID() {
+        return TaskID;
+    }
+
+    public void setTaskID(int taskID) {
+        TaskID = taskID;
+    }
+
+    public void  initalizeIntervals(){
 
 
         int daysBetween = daysBetween(StartDate.getTime(), EndDate.getTime());

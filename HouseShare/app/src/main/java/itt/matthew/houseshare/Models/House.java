@@ -85,10 +85,23 @@ public class House implements Parcelable {
         categories.add(Gas);
         categories.add(Electricity);
 
+
+        TaskArea  Kitchen= new TaskArea ("Kitchen", "Clean the Kitchen", Color.rgb(26, 63, 28));
+        TaskArea LivingRoom = new TaskArea ("Living Room", "Clean the Living Room",  Color.rgb(11, 91, 71));
+        TaskArea Bathroom = new TaskArea ("Bathroom","Clean the Bathroom", Color.rgb(49, 30, 100));
+        TaskArea Garden = new TaskArea ("Garden", "Tidy the Garden", Color.rgb(100, 9, 27));
+
+        ArrayList<TaskArea > taskAreas = new ArrayList<TaskArea>();
+        taskAreas.add(Kitchen);
+        taskAreas.add(LivingRoom);
+        taskAreas.add(Bathroom);
+        taskAreas.add(Garden);
+
+
+
         ArrayList<Cost> costs = new ArrayList<Cost>();
         ArrayList<Cost> archivedCosts = new ArrayList<Cost>();
         ArrayList<Task> tasks = new ArrayList<>();
-        ArrayList<TaskArea> taskAreas = new ArrayList<>();
 
         setCosts(costs);
         setArchivedCosts(archivedCosts);

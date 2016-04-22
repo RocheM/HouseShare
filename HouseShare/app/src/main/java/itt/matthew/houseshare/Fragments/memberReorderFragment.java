@@ -20,14 +20,21 @@ import com.thesurix.gesturerecycler.GestureAdapter;
 import com.thesurix.gesturerecycler.GestureManager;
 import com.thesurix.gesturerecycler.RecyclerItemTouchListener;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+
 import java.util.ArrayList;
 
 import itt.matthew.houseshare.Activities.AccountActivity;
 import itt.matthew.houseshare.Adapters_CustomViews.MembersAdapter;
 import itt.matthew.houseshare.Adapters_CustomViews.MembersReorderAdapter;
 import itt.matthew.houseshare.Adapters_CustomViews.SimpleItemTouchHelperCallback;
+import itt.matthew.houseshare.Events.RequestDetailsEvent;
+import itt.matthew.houseshare.Events.RequestTaskEvent;
+import itt.matthew.houseshare.Events.TaskEvent;
 import itt.matthew.houseshare.Models.Account;
 import itt.matthew.houseshare.Models.House;
+import itt.matthew.houseshare.Models.Task;
 import itt.matthew.houseshare.R;
 
 public class memberReorderFragment extends Fragment implements MembersReorderAdapter.OnDragStartListener {
@@ -41,6 +48,7 @@ public class memberReorderFragment extends Fragment implements MembersReorderAda
 
     private Account current;
     private House house;
+    private Task newTask = new Task();
     private ArrayList<Account> members;
     private GestureManager mGestureManager;
     private MembersReorderAdapter adapter;
@@ -77,6 +85,33 @@ public class memberReorderFragment extends Fragment implements MembersReorderAda
         return inflater.inflate(R.layout.fragment_member_reorder, container, false);
     }
 
+
+    @Subscribe
+    public void onTaskEvent(TaskEvent taskEvent){
+        newTask = taskEvent.getTask();
+    }
+
+    @Subscribe
+    public void onRequestTaskEvent(RequestTaskEvent requestTaskEvent){
+
+
+        if (requestTaskEvent.getReqestID() == 1){
+
+            ArrayList<Account> accounts = adapter.getMembers();
+            ArrayList<String> IDs = new ArrayList<>();
+
+            for (int i =0 ; i < accounts.size(); i++) {
+                IDs.add(accounts.get(i).getFacebookID());
+            }
+
+            newTask.setUsers(IDs);
+
+            EventBus.getDefault().post(new TaskEvent(newTask));
+
+        }
+
+    }
+
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -102,18 +137,15 @@ public class memberReorderFragment extends Fragment implements MembersReorderAda
         rv.addOnItemTouchListener(new RecyclerItemTouchListener(getActivity(), new DefaultItemClickListener() {
             @Override
             public boolean onItemClick(final View view, final int position) {
-                Snackbar.make(view, "Click event on the " + position + " position", Snackbar.LENGTH_SHORT).show();
                 return true;
             }
 
             @Override
             public void onItemLongPress(final View view, final int position) {
-                Snackbar.make(view, "Long press event on the " + position + " position", Snackbar.LENGTH_SHORT).show();
             }
 
             @Override
             public boolean onDoubleTap(final View view, final int position) {
-                Snackbar.make(view, "Double tap event on the " + position + " position", Snackbar.LENGTH_SHORT).show();
                 return true;
             }
         }));
@@ -137,6 +169,22 @@ public class memberReorderFragment extends Fragment implements MembersReorderAda
     public void onDestroy() {
         super.onDestroy();
     }
+
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        org.greenrobot.eventbus.EventBus.getDefault().register(this);
+
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        org.greenrobot.eventbus.EventBus.getDefault().unregister(this);
+
+    }
+
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {

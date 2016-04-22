@@ -12,6 +12,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -87,9 +88,8 @@ public class NewCost extends AppCompatActivity implements ColorChooserDialog.Col
 
     private int categorySelectedColor = 0;
     private CircleImageView colorPreview;
-    private TextView colorPreviewText;
-    private Button colorButton;
     private EditText categoryName;
+    private TextInputLayout categoryDescription;
 
 
 
@@ -181,9 +181,13 @@ public class NewCost extends AppCompatActivity implements ColorChooserDialog.Col
         LinearLayout background = (LinearLayout) findViewById(R.id.cost_title_container);
         Toolbar toolbar = (Toolbar) findViewById(R.id.cost_toolbar);
         TabLayout tabs = (TabLayout) findViewById(R.id.costs_tabs);
-        background.setBackgroundColor(color);
-        toolbar.setBackgroundColor(color);
-        tabs.setBackgroundColor(color);
+
+        if (background != null && toolbar != null && tabs != null) {
+            background.setBackgroundColor(color);
+            toolbar.setBackgroundColor(color);
+            tabs.setBackgroundColor(color);
+        }
+
 
         Window window = this.getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
@@ -211,7 +215,7 @@ public class NewCost extends AppCompatActivity implements ColorChooserDialog.Col
 
 
         android.support.v7.widget.Toolbar toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.cost_toolbar);
-        ViewPager viewPager  = (ViewPager) findViewById(R.id.cost_viewpager);
+        ViewPager viewPager = (ViewPager) findViewById(R.id.cost_viewpager);
         final TabLayout tabLayout = (TabLayout) findViewById(R.id.costs_tabs);
 
         viewPager.setAdapter(new TabsAdapter(getSupportFragmentManager()));
@@ -224,14 +228,13 @@ public class NewCost extends AppCompatActivity implements ColorChooserDialog.Col
         getSupportActionBar().setDisplayUseLogoEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-
+        toolbar.setTitle(R.string.createNewCost);
+        toolbar.setTitleTextColor(getResources().getColor(R.color.white));
 
 
         category = (Spinner) findViewById(R.id.CategorySpinner);
-        fab = (FloatingActionButton) findViewById(R.id.cost_fab);
-
-        fab.setImageResource(R.drawable.ic_add_24dp);
-
+        com.getbase.floatingactionbutton.FloatingActionButton fab1 = (com.getbase.floatingactionbutton.FloatingActionButton) findViewById(R.id.fab_cost_actionA);
+        fab1.setIconDrawable(getResources().getDrawable(R.drawable.ic_grade_white_18dp));
 
         boolean wrapInScrollView = true;
         final MaterialDialog.Builder builder = new MaterialDialog.Builder(this)
@@ -240,7 +243,6 @@ public class NewCost extends AppCompatActivity implements ColorChooserDialog.Col
                 .positiveText("Create")
                 .negativeText("Cancel")
                 .autoDismiss(false);
-
 
 
         for (int i = 0; i < house.getCostCategory().size(); i++) {
@@ -268,102 +270,96 @@ public class NewCost extends AppCompatActivity implements ColorChooserDialog.Col
         });
 
 
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        if (fab1 != null) {
+            fab1.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
 
-                dialog = builder
-                        .onPositive(new MaterialDialog.SingleButtonCallback() {
-                            @Override
-                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                    dialog = builder
+                            .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                @Override
+                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
 
-                                View dialogView = dialog.getView();
-                                boolean error = false;
-                                ColorDrawable  drawable = new ColorDrawable(getResources().getColor(R.color.white));
-                                colorPreview.setImageDrawable(drawable);
-                                colorPreviewText.setText(R.string.selectedColor);
-
-
-
-                                String name = categoryName.getText().toString();
-                                if (name.length() <= 0) {
-                                    categoryName.setError("Must enter a name");
-                                    error = true;
-                                } else
-                                    error = false;
-
-                                if (categorySelectedColor == 0){
-                                    error = true;
-                                    colorButton.setError("Must Select A Color");
-                                    Toast.makeText(getApplicationContext(), "Must Select A Color", Toast.LENGTH_SHORT).show();
-                                }
-
-
-                                if (!error) {
-                                    colorButton.setError(null);
-                                    categoryName.setText("");
-                                    categoryName.setError(null);
-                                    drawable = new ColorDrawable(getResources().getColor(R.color.white));
+                                    View dialogView = dialog.getView();
+                                    boolean error = false;
+                                    ColorDrawable drawable = new ColorDrawable(getResources().getColor(R.color.white));
                                     colorPreview.setImageDrawable(drawable);
 
-                                    colorPreviewText.setText("");
+
+                                    String name = categoryName.getText().toString();
+                                    if (name.length() <= 0 || name.length() >= 50) {
+                                        categoryName.setError("Invalid Name");
+                                        error = true;
+                                    } else
+                                        error = false;
+
+                                    if (categorySelectedColor == 0) {
+                                        error = true;
+                                        categoryName.setError("Must Select A Color");
+                                        Toast.makeText(getApplicationContext(), "Must Select A Color", Toast.LENGTH_SHORT).show();
+                                    }
 
 
-                                    CostCategory newCategory = new CostCategory(name, categorySelectedColor);
-                                    categorySelectedColor = 0;
-                                    ArrayList<CostCategory> cat = house.getCostCategory();
-                                    cat.add(newCategory);
-                                    house.setCostCategories(cat);
-                                    UpdateUI();
-                                    newCost.setCategory(newCategory);
-                                    org.greenrobot.eventbus.EventBus.getDefault().post(new CostEvent(newCost));
-                                    dialog.dismiss();
+                                    if (!error) {
+                                        categoryName.setText("");
+                                        categoryName.setError(null);
+                                        drawable = new ColorDrawable(getResources().getColor(R.color.white));
+                                        colorPreview.setImageDrawable(drawable);
+
+
+
+                                        CostCategory newCategory = new CostCategory(name, categorySelectedColor);
+                                        categorySelectedColor = 0;
+                                        ArrayList<CostCategory> cat = house.getCostCategory();
+                                        cat.add(newCategory);
+                                        house.setCostCategories(cat);
+                                        UpdateUI();
+                                        newCost.setCategory(newCategory);
+                                        org.greenrobot.eventbus.EventBus.getDefault().post(new CostEvent(newCost));
+                                        dialog.dismiss();
+                                    }
+
                                 }
+                            })
+                            .onNegative(new MaterialDialog.SingleButtonCallback() {
+                                @Override
+                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                    dialog.dismiss();
 
-                            }
-                        })
-                        .onNegative(new MaterialDialog.SingleButtonCallback() {
-                            @Override
-                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                dialog.dismiss();
-
-                                colorButton.setError(null);
-                                categoryName.setText("");
-                                categoryName.setError(null);
-                                ColorDrawable drawable = new ColorDrawable(getResources().getColor(R.color.white));
-                                colorPreview.setImageDrawable(drawable);
-                                categorySelectedColor = 0;
-                                colorPreviewText.setText("");
+                                    categoryName.setText("");
+                                    categoryName.setError(null);
+                                    ColorDrawable drawable = new ColorDrawable(getResources().getColor(R.color.white));
+                                    colorPreview.setImageDrawable(drawable);
+                                    categorySelectedColor = 0;
 
 
-                            }
-                        }).build();
-                dialog.show();
-                View dialogView = dialog.getCustomView();
+                                }
+                            }).build();
+                    dialog.show();
+                    View dialogView = dialog.getCustomView();
 
 
-                colorButton = (Button) dialogView.findViewById(R.id.colorButton);
-                colorButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        buildColor();
-                    }
-                });
+                    colorPreview = (CircleImageView) dialogView.findViewById(R.id.color_preview);
+                    colorPreview.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            buildColor();
+                        }
+                    });
 
-                colorPreview = (CircleImageView) dialogView.findViewById(R.id.color_preview);
-                colorPreviewText = (TextView) dialogView.findViewById(R.id.dialog_color_preview);
-                categoryName = (EditText) dialogView.findViewById(R.id.categoryNameInput);
-
-                ColorDrawable  drawable = new ColorDrawable(getResources().getColor(R.color.white));
-                colorPreview.setImageDrawable(drawable);
-                colorPreviewText.setText(R.string.selectedColor);
-
+                    colorPreview = (CircleImageView) dialogView.findViewById(R.id.color_preview);
+                    categoryName = (EditText) dialogView.findViewById(R.id.categoryNameInput);
+                    categoryDescription = (TextInputLayout) dialogView.findViewById(R.id.category_description_layout);
+                    categoryDescription.setVisibility(View.GONE);
+                    ColorDrawable drawable = new ColorDrawable(getResources().getColor(R.color.white));
+                    colorPreview.setImageDrawable(drawable);
 
 
-            }
-        });
-
+                }
+            });
+        }
     }
+
 
     private void UpdateUI() {
 
@@ -414,6 +410,7 @@ public class NewCost extends AppCompatActivity implements ColorChooserDialog.Col
                     runOnUiThread(new Runnable() {
                         public void run() {
                            finish();
+
                         }
                     });
                 } catch (Exception exception) {

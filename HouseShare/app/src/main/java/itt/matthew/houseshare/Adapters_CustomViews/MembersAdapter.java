@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -44,6 +45,7 @@ public class MembersAdapter extends RecyclerView.Adapter<MembersAdapter.MemberVi
     public static class MemberViewHolder extends RecyclerView.ViewHolder {
 
         CardView cardView;
+        ImageView handle;
         CircleImageView profilePic;
         TextView profileName;
         Account currentItem;
@@ -72,6 +74,7 @@ public class MembersAdapter extends RecyclerView.Adapter<MembersAdapter.MemberVi
 
 
                 cardView = (CardView)itemView.findViewById(R.id.house_settings_cv);
+                handle = (ImageView)itemView.findViewById(R.id.handle);
                 profilePic = (CircleImageView)itemView.findViewById(R.id.house_profile_image);
                 profileName = (TextView)itemView.findViewById(R.id.house_profile_name);
 
@@ -116,6 +119,7 @@ public class MembersAdapter extends RecyclerView.Adapter<MembersAdapter.MemberVi
 
         Picasso.with(currentContext).load("http://graph.facebook.com/" + persons.getMembers().get(i).getFacebookID() + "/picture?type=large").placeholder(R.mipmap.placeholder_person).into(memberViewHolder.profilePic);
         memberViewHolder.bind(memberViewHolder.cardView, i, onItemTouchListener);
+        memberViewHolder.handle.setVisibility(View.GONE);
 
     }
 

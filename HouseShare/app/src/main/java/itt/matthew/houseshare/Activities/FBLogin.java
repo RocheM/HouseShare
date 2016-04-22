@@ -6,21 +6,17 @@ import android.os.Bundle;
 import itt.matthew.houseshare.Fragments.FBLoginFragment;
 import itt.matthew.houseshare.R;
 
-public class FBLogin extends AppCompatActivity implements FBLoginFragment.OnFragmentInteractionListener {
+public class FBLogin extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fblogin);
 
-        getSupportActionBar().setTitle("Welcome");
+        getSupportActionBar().setTitle(R.string.welcome);
 
         }
 
-    public void onFragmentInteraction(){
-
-
-    }
 
 
 }

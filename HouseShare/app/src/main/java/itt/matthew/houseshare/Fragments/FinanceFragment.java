@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.provider.DocumentsContract;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -142,6 +143,7 @@ public class FinanceFragment extends Fragment {
     public void onStart() {
         super.onStart();
         EventBus.getDefault().register(this);
+        populateItems();
     }
 
     @Override
@@ -156,6 +158,8 @@ public class FinanceFragment extends Fragment {
 
         current_account = event.getAccount();
         current_house = event.getHouse();
+
+        populateItems();
     }
 
     @Subscribe
@@ -409,6 +413,22 @@ public class FinanceFragment extends Fragment {
 
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.rv);
 
+
+        if (current_house.getCost().size() == 0) {
+
+            mRecyclerView.setVisibility(View.GONE);
+            CardView empty = (CardView) rootView.findViewById(R.id.finance_empty);
+            empty.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    EventBus.getDefault().post(new RequestDetailsEvent('h'));
+                }
+            });
+            empty.setVisibility(View.VISIBLE);
+        } else {
+
+
+
         if (!personal){
             mRecyclerView.setPadding(0, 150, 0, 0);
         }
@@ -423,6 +443,7 @@ public class FinanceFragment extends Fragment {
 
        // checkExpired();
 
+        }
         return rootView;
     }
 
@@ -443,9 +464,6 @@ public class FinanceFragment extends Fragment {
             fab.setTitle("New Cost");
             fab.setIcon(R.drawable.ic_note_add_24dp);
 
-            com.getbase.floatingactionbutton.FloatingActionButton fab2 = (com.getbase.floatingactionbutton.FloatingActionButton) getView().findViewById(R.id.action_b);
-            fab2.setTitle("View Archive");
-            fab2.setIcon(R.drawable.ic_insert_drive_file_24dp);
 
 
             fab.setOnClickListener(new View.OnClickListener() {
@@ -456,12 +474,6 @@ public class FinanceFragment extends Fragment {
                 }
             });
 
-            fab2.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Toast.makeText(getContext(), "TODO", Toast.LENGTH_LONG).show();
-                }
-            });
         }
 
 
@@ -474,11 +486,6 @@ public class FinanceFragment extends Fragment {
                 fab.setTitle("New Cost");
                 fab.setIcon(R.drawable.ic_note_add_24dp);
                 fab.setVisibility(View.GONE);
-
-                com.getbase.floatingactionbutton.FloatingActionButton fab2 = (com.getbase.floatingactionbutton.FloatingActionButton) getView().findViewById(R.id.action_b);
-                fab2.setTitle("View Archive");
-                fab2.setIcon(R.drawable.ic_insert_drive_file_24dp);
-                fab2.setVisibility(View.GONE);
 
         }
     }
@@ -519,6 +526,7 @@ public class FinanceFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+
 
     }
 
@@ -587,12 +595,22 @@ public class FinanceFragment extends Fragment {
 
     private void populateItems(){
 
-        adapter = new RVAdapter(current_house, current_account, personal, itemTouch);
-        mRecyclerView.setAdapter(adapter);
+        if (current_house.getCost().size() == 0) {
 
-        adapter = new RVAdapter(current_house, current_account, personal, itemTouch);
-        mRecyclerView.setAdapter(adapter);
+            mRecyclerView.setVisibility(View.GONE);
+            CardView empty = (CardView) getView().findViewById(R.id.finance_empty);
+            empty.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    EventBus.getDefault().post(new RequestDetailsEvent('h'));
+                }
+            });
+            empty.setVisibility(View.VISIBLE);
 
+        }else {
+            adapter = new RVAdapter(current_house, current_account, personal, itemTouch);
+            mRecyclerView.setAdapter(adapter);
+        }
     }
 
 
