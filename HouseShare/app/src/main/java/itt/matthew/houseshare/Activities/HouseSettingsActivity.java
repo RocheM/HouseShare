@@ -1,8 +1,12 @@
 package itt.matthew.houseshare.Activities;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
+import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
@@ -13,6 +17,8 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -23,7 +29,9 @@ import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.microsoft.windowsazure.mobileservices.MobileServiceClient;
 import com.microsoft.windowsazure.mobileservices.authentication.MobileServiceUser;
@@ -40,6 +48,7 @@ import java.util.ArrayList;
 import itt.matthew.houseshare.Events.AccountEvent;
 import itt.matthew.houseshare.Events.MyHandler;
 import itt.matthew.houseshare.Fragments.ArchivedCostFragment;
+import itt.matthew.houseshare.Fragments.ArchivedTaskFragment;
 import itt.matthew.houseshare.Fragments.DetailsFragment;
 import itt.matthew.houseshare.Fragments.FinanceFragment;
 import itt.matthew.houseshare.Fragments.color_dialog;
@@ -64,6 +73,7 @@ public class HouseSettingsActivity extends AppCompatActivity {
     private MobileServiceTable<Account> mAccountTable;
     private MobileServiceTable<House> mHouseTable;
     private TextView id;
+    private Boolean nameChanged, descriptionChanged;
     private EditText description, houseName;
     private Toolbar toolbar;
     private Window window;
@@ -179,7 +189,7 @@ public class HouseSettingsActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void setupUI(){
+    private void setupUI() {
         DateFormat formatter = DateFormat.getDateInstance(DateFormat.SHORT);
 
         toolbar = (Toolbar) findViewById(R.id.house_toolbar);
@@ -197,32 +207,171 @@ public class HouseSettingsActivity extends AppCompatActivity {
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark));
 
-        ViewPager viewPager  = (ViewPager) findViewById(R.id.house_viewpager);
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.house_tabs);
+        ViewPager viewPager = (ViewPager) findViewById(R.id.house_viewpager);
+        final TabLayout tabLayout = (TabLayout) findViewById(R.id.house_tabs);
+        final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.settings_fab);
+        fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_done_24dp));
 
         assert viewPager != null;
         viewPager.setAdapter(new TabsAdapter(getSupportFragmentManager()));
         assert tabLayout != null;
         tabLayout.setupWithViewPager(viewPager);
 
+        nameChanged = false;
+        descriptionChanged = false;
+
         houseName = (EditText) findViewById(R.id.house_name);
         assert houseName != null;
-        houseName.setSelected(false);
+        houseName.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                  fab.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
 
         description = (EditText) findViewById(R.id.house_description);
         assert description != null;
-        description.setSelected(false);
+        description.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
-        TextInputLayout nameEditText = (TextInputLayout) findViewById(R.id.house_houseNameInput);
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                fab.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+        final TextInputLayout nameEditText = (TextInputLayout) findViewById(R.id.house_houseNameInput);
         assert nameEditText != null;
         nameEditText.setHint("Name: " + house.getName());
         nameEditText.setSelected(false);
 
 
-        TextInputLayout descriptionEditText = (TextInputLayout) findViewById(R.id.house_houseDescInput);
+        final TextInputLayout descriptionEditText = (TextInputLayout) findViewById(R.id.house_houseDescInput);
         assert descriptionEditText != null;
         descriptionEditText.setHint("Description: " + house.getDescription());
         descriptionEditText.setSelected(false);
+
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Boolean error = false;
+
+                String name = nameEditText.getEditText().getText().toString();
+                String houseDescription = descriptionEditText.getEditText().getText().toString();
+
+                if(!(house.getName().equals(name))) {
+                    if (name.length() < 5) {
+                        error = true;
+                        nameEditText.setError("Name Must Be Greater Than 5 Characters");
+                    }
+
+                    if (name.length() > 50) {
+                        error = true;
+                        nameEditText.setError("Description Must Be Less Than 50 Characters");
+                    }
+                }
+
+                if(!(house.getDescription().equals(houseDescription))) {
+                    if (houseDescription.length() < 5) {
+                        error = true;
+                        descriptionEditText.setError("Description Must Be Greater Than 5 Characters");
+                    }
+
+                    if (houseDescription.length() > 100) {
+                        error = true;
+                        descriptionEditText.setError("Description Must Be Less Than 100 Characters");
+                    }
+                }
+
+
+                if (!error) {
+                    nameEditText.setError(null);
+                    descriptionEditText.setError(null);
+                    house.setName(nameEditText.getEditText().getText().toString());
+                    house.setDescription(descriptionEditText.getEditText().getText().toString());
+
+                    boolean wrapInScrollView = true;
+                    new MaterialDialog.Builder(v.getContext())
+                            .title("Confirm Change?")
+                            .content("House Details:\n\nName:\t" + name + "\nDescription:\t" + houseDescription)
+                            .positiveText("Confirm")
+                            .negativeText("Cancel")
+                            .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                @Override
+                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                    updateItem(house);
+                                }
+                            })
+                            .show();
+                }
+            }
+        });
+    }
+
+
+    private void updateItem(final House item) {
+        if (mClient == null) {
+            return;
+        }
+
+        final ProgressDialog progress = new ProgressDialog(this);
+        progress.setTitle("Updating");
+        progress.setMessage("Updating House...");
+        progress.show();
+
+
+        final MaterialDialog error = new MaterialDialog.Builder(getApplicationContext()).build();
+
+        new AsyncTask<Void, Void, Void>() {
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    mHouseTable.update(item).get();
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            startMainActivity(current);
+                        }
+                    });
+                } catch (Exception exception) {
+
+                    exception.printStackTrace();
+                }
+                return null;
+            }
+        }.execute();
+    }
+
+
+    public void startMainActivity(Account acc) {
+
+        Intent i = new Intent(this, MainActivity.class);
+        Bundle b = new Bundle();
+        b.putParcelable("Account", acc);
+        i.putExtra("Bundle", b);
+        startActivity(i);
+        finish();
+
+
     }
 
     class TabsAdapter extends FragmentPagerAdapter {
@@ -232,15 +381,18 @@ public class HouseSettingsActivity extends AppCompatActivity {
 
         @Override
         public int getCount() {
-            return 2;
+            return 3;
         }
 
         @Override
         public Fragment getItem(int i) {
             switch(i) {
-                case 0: return membersFragment.newInstance("Test", "Test");
-                case 1: return ArchivedCostFragment.newInstance("Test", "Test");
-
+                case 0:
+                    Bundle b = getIntent().getExtras().getBundle("extra");
+                    b.putBoolean("reorder", false);
+                    return membersFragment.newInstance("Test", "Test");
+                case 1:return ArchivedCostFragment.newInstance("Test", "Test");
+                case 2: return ArchivedTaskFragment.newInstance("Test", "Test");
             }
             return null;
         }
@@ -250,6 +402,7 @@ public class HouseSettingsActivity extends AppCompatActivity {
             switch(position) {
                 case 0: return "Members";
                 case 1: return "Archived Costs";
+                case 2: return "Archived Tasks";
             }
             return "";
         }

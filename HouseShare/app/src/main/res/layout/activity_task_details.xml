@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout
-xmlns:android="http://schemas.android.com/apk/res/android"
-xmlns:app="http://schemas.android.com/apk/res-auto"
-android:layout_width="match_parent"
-android:layout_height="match_parent">
-​
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    ​
     <android.support.design.widget.AppBarLayout
-        android:id="@+id/details.appbar"
+        android:id="@+id/task.details.appbar"
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         >
         ​
         <android.support.v7.widget.Toolbar
-            android:id="@+id/details.toolbar"
+            android:id="@+id/task.details.toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:minHeight="?attr/actionBarSize"
@@ -30,17 +30,18 @@ android:layout_height="match_parent">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/detailsBillName"
+                android:id="@+id/detailsTaskName"
                 android:layout_alignParentStart="true"
                 android:textAppearance="@style/TextAppearance.AppCompat.Headline"
                 android:layout_margin="5dp"/>
 
 
             <TextView
+
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/detailsBillName"
-                android:id="@+id/detailsBillAmount"
+                android:layout_below="@id/detailsTaskName"
+                android:id="@+id/detailsTaskDates"
                 android:layout_alignParentStart="true"
                 android:textAppearance="@style/TextAppearance.AppCompat.Headline"
                 android:layout_margin="2dp"/>
@@ -49,11 +50,12 @@ android:layout_height="match_parent">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/detailsBillAmount"
-                android:id="@+id/detailsBillPayers"
+                android:layout_below="@id/detailsTaskDates"
+                android:id="@+id/detailsTaskMembers"
                 android:layout_alignParentStart="true"
                 android:textAppearance="@style/TextAppearance.AppCompat.Headline"
                 android:layout_margin="2dp"/>
+
 
 
         </RelativeLayout>
@@ -61,7 +63,7 @@ android:layout_height="match_parent">
     </android.support.design.widget.AppBarLayout>
 
     <FrameLayout
-        android:id="@+id/detailsFragmentHolder"
+        android:id="@+id/taskDetailsFragmentHolder"
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -70,6 +72,6 @@ android:layout_height="match_parent">
 
 
 
-​​
+    ​​
 </android.support.design.widget.CoordinatorLayout>
 

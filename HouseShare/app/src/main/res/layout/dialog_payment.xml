@@ -5,7 +5,28 @@
     android:id="@+id/payment_layout"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:text="@string/category"
+        android:id="@+id/dialog.payment.category"
+        android:textAppearance="@android:style/TextAppearance.Medium"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/dialog.payment.category"
+        android:id="@+id/dialog.payment.amount"
+        android:textAppearance="@android:style/TextAppearance.Medium"/>
 
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/dialog.payment.amount"
+        android:id="@+id/dialog.payment.datePaid"
+        android:textAppearance="@android:style/TextAppearance.Medium"
+        android:visibility="gone"/>
 
 </RelativeLayout>

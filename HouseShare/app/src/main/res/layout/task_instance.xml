@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<android.support.v7.widget.CardView
+    android:layout_width="match_parent"
+    android:layout_height="150dp"
+    android:layout_margin="20dp"
+    android:id="@+id/task.cv"
+    android:foreground="?android:attr/selectableItemBackground"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+        <ImageView
+            android:id="@+id/task.color"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_alignParentTop="true"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/task.status"
+            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+            android:text="@string/app_name"
+            android:textColor="@color/off_white"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="15dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/dueDate"
+            android:id="@+id/task.due"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@+id/task.color"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/task.date"
+            android:layout_below="@+id/task.due"
+            android:text="TEST"
+            android:layout_centerInParent="true"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/task.owner.label"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/task.date"
+            android:text="@string/owner"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/task.owner"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@+id/task.owner.label"
+            android:text="@string/amount" />
+
+
+
+    </RelativeLayout>
+
+</android.support.v7.widget.CardView>

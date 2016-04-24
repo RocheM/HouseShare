@@ -1,7 +1,6 @@
 package itt.matthew.houseshare.Fragments;
 
-import android.content.Context;
-import android.net.Uri;
+
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -12,12 +11,12 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import itt.matthew.houseshare.Adapters_CustomViews.ArchiveAdapter;
-import itt.matthew.houseshare.Adapters_CustomViews.RVAdapter;
+import itt.matthew.houseshare.Adapters_CustomViews.ArchiveTaskAdapter;
 import itt.matthew.houseshare.Models.Account;
 import itt.matthew.houseshare.Models.House;
 import itt.matthew.houseshare.R;
-public class ArchivedCostFragment extends Fragment {
 
+public class ArchivedTaskFragment extends Fragment {
 
 
     private Account current;
@@ -26,15 +25,18 @@ public class ArchivedCostFragment extends Fragment {
     private LinearLayoutManager mLayoutManager;
 
 
-    public ArchivedCostFragment() {
+
+    public ArchivedTaskFragment() {
     }
 
-    public static ArchivedCostFragment newInstance(String param1, String param2) {
-        ArchivedCostFragment fragment = new ArchivedCostFragment();
+
+    public static ArchivedTaskFragment newInstance(String param1, String param2) {
+        ArchivedTaskFragment fragment = new ArchivedTaskFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
     }
+
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
@@ -45,9 +47,10 @@ public class ArchivedCostFragment extends Fragment {
 
     }
 
+
     private void setupUI(){
 
-        ArchivedCostFragment.OnItemTouchListener itemTouch = new ArchivedCostFragment.OnItemTouchListener() {
+        ArchivedTaskFragment.OnItemTouchListener itemTouch = new ArchivedTaskFragment.OnItemTouchListener() {
             @Override
             public void onCardViewTouch(View view, int position) {
                 Toast.makeText(view.getContext(), Integer.toString(position), Toast.LENGTH_SHORT).show();
@@ -60,13 +63,13 @@ public class ArchivedCostFragment extends Fragment {
         };
 
 
-        mRecyclerView = (RecyclerView) getView().findViewById(R.id.archived_RV);
+        mRecyclerView = (RecyclerView) getView().findViewById(R.id.archived_task_RV);
 
 
         mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        ArchiveAdapter adapter = new ArchiveAdapter(house, current, itemTouch);
+        ArchiveTaskAdapter adapter = new ArchiveTaskAdapter(house, current, itemTouch);
 
         mRecyclerView.setAdapter(adapter);
         mRecyclerView.setClickable(true);
@@ -82,33 +85,7 @@ public class ArchivedCostFragment extends Fragment {
 
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-        }
-    }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_archived_cost, container, false);
-    }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-    }
 
 
     public class OnItemTouchListener {
@@ -116,6 +93,13 @@ public class ArchivedCostFragment extends Fragment {
         }
         public void onCardViewHeld(View item, int position) {
         }
+    }
+
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_archived_task, container, false);
     }
 
 }

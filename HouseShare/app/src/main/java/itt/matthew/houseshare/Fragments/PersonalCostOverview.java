@@ -39,11 +39,17 @@ import com.paypal.android.MEP.PayPalPayment;
 import com.paypal.android.MEP.PayPalResultDelegate;
 
 import org.greenrobot.eventbus.Subscribe;
+import org.w3c.dom.Text;
 
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
+import java.text.DateFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Currency;
+import java.util.Date;
+import java.util.Locale;
 
 import itt.matthew.houseshare.Adapters_CustomViews.DateGridAdapter;
 import itt.matthew.houseshare.Events.OverviewEvent;
@@ -52,9 +58,6 @@ import itt.matthew.houseshare.Models.Cost;
 import itt.matthew.houseshare.Models.House;
 import itt.matthew.houseshare.R;
 
-/**
- * A simple {@link Fragment} subclass.
- */
 public class PersonalCostOverview extends Fragment implements View.OnClickListener {
 
 
@@ -285,9 +288,9 @@ public class PersonalCostOverview extends Fragment implements View.OnClickListen
     private void updatePaid(){
 
         for (int i = 0; i < cost.getIntervals().get(selectedCost).paid.size(); i++){
-            Log.d("TEST", "onCardViewTouch: ");
             if(selected.getFacebookID().equals(cost.getIntervals().get(selectedCost).paid.get(i).first)){
                 cost.getIntervals().get(selectedCost).setPaid(i, true);
+                cost.getIntervals().get(selectedCost).setPaidOn(Calendar.getInstance());
             }
         }
 
@@ -381,20 +384,61 @@ public class PersonalCostOverview extends Fragment implements View.OnClickListen
                     ownsCost = true;
                 }
 
+                Double costAmount = 0.0;
+                Date datePaid = Calendar.getInstance().getTime();
+
                 for (int i = 0; i < cost.getIntervals().get(position).paid.size(); i++){
                     if(selected.getFacebookID().equals(cost.getIntervals().get(position).paid.get(i).first)){
                         paid = cost.getIntervals().get(position).paid.get(i).second;
+                        if (cost.getIntervals().get(position).getPaidOn() !=  null){
+                            datePaid = cost.getIntervals().get(position).getPaidOn().getTime();
+                        }
+                    }
+                }
+
+                for (int i = 0; i < cost.getSplit().size(); i++){
+                    if (cost.getSplit().get(i).getUserFacebookID().equals(account.getFacebookID())){
+                        costAmount = cost.getSplit().get(i).getAmount();
                     }
                 }
 
                 if (ownsCost && !paid) {
+                    dialog = new MaterialDialog.Builder(getContext())
+                            .title("Payment Details")
+                            .customView(R.layout.dialog_payment, true)
+                            .positiveText("Confirm")
+                            .show();
+
+                    NumberFormat format = NumberFormat.getCurrencyInstance(Locale.GERMANY);
+                    TextView category = (TextView) dialog.getView().findViewById(R.id.dialog_payment_category);
+                    TextView amount = (TextView) dialog.getView().findViewById(R.id.dialog_payment_amount);
+                    category.setText(getString(R.string.category) + ":\t" +  cost.getCategory().getName());
+                    amount.setText("Amount:\t" + format.format(costAmount));
+                    amount.setPadding(0, 0, 0, 150);
+
+
+                    showPayPalButton(dialog.getView());
+                }
+
+                if (paid){
+
                     dialog = new MaterialDialog.Builder(getContext())
                             .title("Make Payment")
                             .customView(R.layout.dialog_payment, true)
                             .positiveText("Confirm")
                             .show();
 
-                    showPayPalButton(dialog.getView());
+                    NumberFormat format = NumberFormat.getCurrencyInstance(Locale.GERMANY);
+                    DateFormat formatter = DateFormat.getDateInstance(DateFormat.SHORT);
+
+                    TextView category = (TextView) dialog.getView().findViewById(R.id.dialog_payment_category);
+                    TextView amount = (TextView) dialog.getView().findViewById(R.id.dialog_payment_amount);
+                    TextView datePaidText = (TextView) dialog.getView().findViewById(R.id.dialog_payment_datePaid);
+                    category.setText(getString(R.string.category) + ":\t" +  cost.getCategory().getName());
+                    amount.setText("Amount:\t" + format.format(costAmount));
+                    datePaidText.setText("Payment Made: " + formatter.format(datePaid));
+                    datePaidText.setVisibility(View.VISIBLE);
+
                 }
 
 

@@ -36,6 +36,15 @@
             android:layout_toEndOf="@+id/overview.profile.image"
             android:textSize="20sp"/>
 
+        <TextView
+            android:id="@+id/overview.profile.personDescription"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/overview.profile.date"
+            android:layout_toEndOf="@+id/overview.profile.image"
+            android:textSize="15sp"
+            android:visibility="gone"/>
+
 
     </RelativeLayout>
 

@@ -40,6 +40,7 @@ public class House implements Parcelable {
     private String archivedCosts;
     private String tasks;
     private String taskAreas;
+    private String archivedTasks;
 
     public House (String name, String description){
 
@@ -69,6 +70,7 @@ public class House implements Parcelable {
         setArchivedCosts(toSet.getArchivedCosts());
         setTasks(toSet.getTask());
         setTaskAreas(toSet.getTaskArea());
+        setArchivedTasks(toSet.getArchivedTasks());
     }
 
 
@@ -102,12 +104,14 @@ public class House implements Parcelable {
         ArrayList<Cost> costs = new ArrayList<Cost>();
         ArrayList<Cost> archivedCosts = new ArrayList<Cost>();
         ArrayList<Task> tasks = new ArrayList<>();
+        ArrayList<Task> archivedTasks = new ArrayList<Task>();
 
         setCosts(costs);
         setArchivedCosts(archivedCosts);
         setCostCategories(categories);
         setTasks(tasks);
         setTaskAreas(taskAreas);
+        setArchivedTasks(archivedTasks);
 
 
     }
@@ -316,6 +320,36 @@ public class House implements Parcelable {
     }
 
 
+
+    public ArrayList<Task> getArchivedTasks() { return getArchivedTasksFromJSON();}
+
+    private ArrayList<Task> getArchivedTasksFromJSON(){
+
+        final Gson gson = new Gson();
+
+        JsonParser parser = new JsonParser();
+        JsonArray o = parser.parse(archivedTasks).getAsJsonArray();
+
+        ArrayList<Task> toReturn = new ArrayList<Task>();
+
+
+        for (int i = 0; i < o.size(); i++) {
+            toReturn.add(gson.fromJson(o.get(i), Task.class));
+        }
+
+
+        return toReturn;
+    }
+
+
+    public void setArchivedTasks(ArrayList<Task> toUpload){
+
+        final Gson gson = new Gson();
+
+        Type listOfTestObject = new TypeToken<ArrayList<Task>>(){}.getType();
+        archivedTasks = gson.toJson(toUpload, listOfTestObject);
+    }
+
     public ArrayList<CostCategory> getCostCategory() { return getCostCategoryFromJSON();}
 
 
@@ -403,6 +437,7 @@ public class House implements Parcelable {
         out.writeString(archivedCosts);
         out.writeString(tasks);
         out.writeString(taskAreas);
+        out.writeString(archivedTasks);
 
     }
 
@@ -423,6 +458,7 @@ public class House implements Parcelable {
         archivedCosts = in.readString();
         tasks = in.readString();
         taskAreas = in.readString();
+        archivedTasks = in.readString();
     }
 
     public static final Parcelable.Creator<House> CREATOR = new Parcelable.Creator<House>() {

@@ -12,24 +12,11 @@ public class TaskInstance {
 
 
     private Calendar date;
+    private String account;
+    private Boolean paid;
+    private String notes;
+    private Calendar paidOn;
 
-    public ArrayList<Pair<String, Boolean>> completedList(){
-        return completed;
-    }
-
-    public boolean isCompleted(int i) {
-
-        return (completed.get(i).second);
-    }
-
-    public void setCompleted(int i, boolean setCompleted) {
-
-        String temp = completed.get(i).first;
-        Pair<String, Boolean> toSet = new Pair<>(temp, setCompleted);
-
-        completed.set(i, toSet);
-
-    }
 
     public Calendar getDate() {
         return date;
@@ -39,11 +26,43 @@ public class TaskInstance {
         this.date = date;
     }
 
-    public ArrayList<Pair<String, Boolean>> completed;
 
-    public TaskInstance(Calendar date, ArrayList<Pair<String, Boolean>> completed){
+    public TaskInstance(Calendar date, String account, Boolean paid){
         this.date = date;
-        this.completed = completed;
+        this.account= account;
+        this.paid = paid;
     }
 
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+
+    public String getAccount() {
+        return account;
+    }
+
+    public void setAccount(String account) {
+        this.account = account;
+    }
+
+
+    public Boolean getPaid() {
+        return paid;
+    }
+
+    public void setPaid(Boolean paid) {
+        this.paid = paid;
+    }
+
+    public Calendar getPaidOn() {
+        return paidOn;
+    }
+
+    public void setPaidOn(Calendar paidOn) {
+        this.paidOn = paidOn;
+    }
 }

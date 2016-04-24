@@ -1,11 +1,8 @@
 package itt.matthew.houseshare.Fragments;
 
-import android.content.Context;
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,9 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.afollestad.materialdialogs.MaterialDialog;
 import com.thesurix.gesturerecycler.DefaultItemClickListener;
-import com.thesurix.gesturerecycler.GestureAdapter;
 import com.thesurix.gesturerecycler.GestureManager;
 import com.thesurix.gesturerecycler.RecyclerItemTouchListener;
 
@@ -25,13 +20,11 @@ import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
 
-import itt.matthew.houseshare.Activities.AccountActivity;
-import itt.matthew.houseshare.Adapters_CustomViews.MembersAdapter;
 import itt.matthew.houseshare.Adapters_CustomViews.MembersReorderAdapter;
 import itt.matthew.houseshare.Adapters_CustomViews.SimpleItemTouchHelperCallback;
-import itt.matthew.houseshare.Events.RequestDetailsEvent;
 import itt.matthew.houseshare.Events.RequestTaskEvent;
 import itt.matthew.houseshare.Events.TaskEvent;
+import itt.matthew.houseshare.Events.AddToListEvent;
 import itt.matthew.houseshare.Models.Account;
 import itt.matthew.houseshare.Models.House;
 import itt.matthew.houseshare.Models.Task;
@@ -53,7 +46,7 @@ public class memberReorderFragment extends Fragment implements MembersReorderAda
     private GestureManager mGestureManager;
     private MembersReorderAdapter adapter;
     private ItemTouchHelper mItemTouchHelper;
-
+    RecyclerView rv;
 
 
     // TODO: Rename and chan types and number of parameters
@@ -85,6 +78,15 @@ public class memberReorderFragment extends Fragment implements MembersReorderAda
         return inflater.inflate(R.layout.fragment_member_reorder, container, false);
     }
 
+
+    @Subscribe
+    public void onAddToListEvent(AddToListEvent addToListEvent){
+        ArrayList<Account> accountArrayList = adapter.getMembers();
+        accountArrayList.add(addToListEvent.getToAdd());
+        adapter = new MembersReorderAdapter(accountArrayList, getContext(), this);
+        rv.setAdapter(adapter);
+
+    }
 
     @Subscribe
     public void onTaskEvent(TaskEvent taskEvent){
@@ -124,8 +126,10 @@ public class memberReorderFragment extends Fragment implements MembersReorderAda
 
     private void setupUI() {
 
-        members = house.getMembers();
-        final RecyclerView rv = (RecyclerView) getView().findViewById(R.id.member_reorder_rv);
+        members = new ArrayList<>();
+        members.add(current);
+
+        rv = (RecyclerView) getView().findViewById(R.id.member_reorder_rv);
 
 
         final LinearLayoutManager manager = new LinearLayoutManager(getContext());

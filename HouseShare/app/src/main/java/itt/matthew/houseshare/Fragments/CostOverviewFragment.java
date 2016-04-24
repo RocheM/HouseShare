@@ -65,9 +65,6 @@ public class CostOverviewFragment extends Fragment {
         rv.setLayoutManager(new LinearLayoutManager(this.getContext()));
         rv.setAdapter(new OverviewAdapter(house, current, getActivity().getApplicationContext(), cost, itemTouchListener));
 
-
-
-
     }
 
     @Override

@@ -25,6 +25,7 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
 import itt.matthew.houseshare.Fragments.FinanceFragment;
+import itt.matthew.houseshare.Fragments.TasksFragment;
 import itt.matthew.houseshare.Fragments.color_dialog;
 import itt.matthew.houseshare.Models.Account;
 import itt.matthew.houseshare.Models.House;
@@ -226,7 +227,7 @@ public class AccountActivity extends AppCompatActivity implements AppBarLayout.O
         public Fragment getItem(int i) {
             switch(i) {
                 case 0: return FinanceFragment.newInstance("Test", "Test");
-                case 1: return color_dialog.newInstance("Test", "Test");
+                case 1: return TasksFragment.newInstance("Test", "Test");
 
             }
             return null;

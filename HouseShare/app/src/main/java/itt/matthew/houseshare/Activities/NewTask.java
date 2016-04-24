@@ -1,12 +1,13 @@
 package itt.matthew.houseshare.Activities;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
-import android.support.annotation.IntegerRes;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
@@ -26,11 +27,9 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
@@ -49,21 +48,15 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import itt.matthew.houseshare.Events.CostEvent;
+import itt.matthew.houseshare.Adapters_CustomViews.DialogAddPersonAdapter;
 import itt.matthew.houseshare.Events.MyHandler;
 import itt.matthew.houseshare.Events.RequestTaskEvent;
 import itt.matthew.houseshare.Events.TaskEvent;
-import itt.matthew.houseshare.Fragments.ArchivedCostFragment;
+import itt.matthew.houseshare.Events.AddToListEvent;
 import itt.matthew.houseshare.Fragments.CreateTaskFragment;
-import itt.matthew.houseshare.Fragments.color_dialog;
 import itt.matthew.houseshare.Fragments.memberReorderFragment;
-import itt.matthew.houseshare.Fragments.membersFragment;
 import itt.matthew.houseshare.Models.Account;
-import itt.matthew.houseshare.Models.Cost;
-import itt.matthew.houseshare.Models.CostCategory;
-import itt.matthew.houseshare.Models.CostSplit;
 import itt.matthew.houseshare.Models.House;
-import itt.matthew.houseshare.Models.Interval;
 import itt.matthew.houseshare.Models.Task;
 import itt.matthew.houseshare.Models.TaskArea;
 import itt.matthew.houseshare.R;
@@ -81,10 +74,12 @@ public class NewTask extends AppCompatActivity implements ColorChooserDialog.Col
     private Task newTask;
     private ArrayList<String> CategoryStrings = new ArrayList<String>();
     private ArrayAdapter<String> categoryAdapter;
+    private Account toAdd;
 
     private Spinner category;
     private FloatingActionButton fab;
     private MaterialDialog dialog;
+    private MaterialDialog dialog2;
 
     private int categorySelectedColor = 0;
     private CircleImageView colorPreview;
@@ -125,7 +120,6 @@ public class NewTask extends AppCompatActivity implements ColorChooserDialog.Col
     @Subscribe
     public void onTaskEvent(TaskEvent taskEvent){
         newTask = taskEvent.getTask();
-        Toast.makeText(this, "Test", Toast.LENGTH_SHORT).show();
     }
 
 
@@ -337,9 +331,71 @@ public class NewTask extends AppCompatActivity implements ColorChooserDialog.Col
 
                 }
             });
+
+
+            final DialogAddPersonAdapter addPersonAdapter = new DialogAddPersonAdapter(this, house.getMembers());
+
+            dialog2 = new MaterialDialog.Builder(this)
+                    .title("Add Person")
+                   .build();
+
+            final Activity active = this;
+
+            fab2.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+
+                    EventBus.getDefault().post(new RequestTaskEvent(1));
+                    final ArrayList<Account> members = new ArrayList<Account>();
+                    ArrayList<String> IDs = new ArrayList<String>();
+
+                    for (int i = 0; i < house.getMembers().size(); i++){
+                        IDs.add(house.getMembers().get(i).getFacebookID());
+                    }
+
+
+                    for (int i = 0; i < IDs.size(); i++){
+                        Boolean contains = false;
+                        if (newTask.getUsers().contains(IDs.get(i))){
+                            contains = true;
+                        }
+                        if (!contains){
+                            members.add(house.getMembers().get(i));
+                        }
+                    }
+
+                    if (members.size() == 0){
+                        showDialogError();
+                    }else {
+
+                        addPersonAdapter.setMembers(members);
+                        dialog2.getBuilder().adapter(addPersonAdapter,
+                                new MaterialDialog.ListCallback() {
+                                    @Override
+                                    public void onSelection(MaterialDialog dialogC, View itemView, int which, CharSequence text) {
+                                        AddToList(members.get(which));
+                                        dialogC.dismiss();
+                                    }
+                                }).positiveText("Done").show();
+                    }
+                }
+            });
         }
     }
 
+    private void showDialogError() {
+        new MaterialDialog.Builder(this)
+                .title("Add Member")
+                .content("It Looks Like You've Added Everyone")
+                .positiveText(R.string.mdtp_ok)
+                .show();
+
+    }
+
+    private void AddToList(Account account) {
+        EventBus.getDefault().post(new AddToListEvent(account));
+    }
 
 
     private void buildColor() {
@@ -525,7 +581,7 @@ public class NewTask extends AppCompatActivity implements ColorChooserDialog.Col
                     mHouseTable.update(item).get();
                     runOnUiThread(new Runnable() {
                         public void run() {
-                            finish();
+                            startMainActivity(current);
                         }
                     });
                 } catch (Exception exception) {
@@ -537,6 +593,18 @@ public class NewTask extends AppCompatActivity implements ColorChooserDialog.Col
         }.execute();
     }
 
+
+
+    public void startMainActivity(Account acc) {
+
+        Intent i = new Intent(this, MainActivity.class);
+        Bundle b = new Bundle();
+        b.putParcelable("Account", acc);
+        i.putExtra("Bundle", b);
+        startActivity(i);
+        finish();
+
+    }
 
 
     class TabsAdapter extends FragmentPagerAdapter {

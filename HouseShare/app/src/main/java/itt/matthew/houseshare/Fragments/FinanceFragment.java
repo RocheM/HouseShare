@@ -7,8 +7,6 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.DocumentsContract;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
@@ -17,71 +15,44 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.microsoft.windowsazure.mobileservices.MobileServiceClient;
 import com.microsoft.windowsazure.mobileservices.authentication.MobileServiceUser;
-import com.microsoft.windowsazure.mobileservices.http.ServiceFilterResponse;
 import com.microsoft.windowsazure.mobileservices.table.MobileServiceTable;
-import com.microsoft.windowsazure.mobileservices.table.TableQueryCallback;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
 
 import itt.matthew.houseshare.Activities.CostDetails;
-import itt.matthew.houseshare.Activities.NewCost;
 import itt.matthew.houseshare.Adapters_CustomViews.RVAdapter;
 import itt.matthew.houseshare.Events.LongPressEvent;
-import itt.matthew.houseshare.Events.MessageEvent;
 import itt.matthew.houseshare.Events.ReplyEvent;
 import itt.matthew.houseshare.Events.RequestDetailsEvent;
 import itt.matthew.houseshare.Events.UpdateAccountEvent;
 import itt.matthew.houseshare.Models.Account;
 import itt.matthew.houseshare.Models.Cost;
 import itt.matthew.houseshare.Models.CostInstance;
-import itt.matthew.houseshare.Models.CostSplit;
 import itt.matthew.houseshare.Models.House;
 import itt.matthew.houseshare.R;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link FinanceFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link FinanceFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class FinanceFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
     private RVAdapter adapter;
 
-    private MobileServiceClient mClient;
     private android.support.v7.widget.RecyclerView mRecyclerView;
-    private android.support.v7.widget.RecyclerView.LayoutManager mLayoutManager;
+    private MobileServiceClient mClient;
 
     private MobileServiceTable<Account> mAccountTable;
     private MobileServiceTable<House> mHouseTable;
     private Account current_account;
     private House current_house;
     private Boolean personal = false;
+    private Boolean updated = false;
 
     private OnItemTouchListener itemTouch;
 
@@ -100,20 +71,22 @@ public class FinanceFragment extends Fragment {
 
 
 
+    @Subscribe
+    public void onReplyEvent(ReplyEvent event){
+        current_account = event.getAccount();
+        current_house = event.getHouse();
+    }
 
     @Subscribe
     public void onUpdateAccountEvent(UpdateAccountEvent event){
         current_account = event.getAccount();
         current_house = event.getHouse();
 
-        populateItems();
     }
 
     public static FinanceFragment newInstance(String param1, String param2) {
         FinanceFragment fragment = new FinanceFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
@@ -124,26 +97,25 @@ public class FinanceFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Bundle extra = getActivity().getIntent().getExtras().getBundle("extra");
-        current_account = extra.getParcelable("account");
-        current_house = extra.getParcelable("house");
-        personal = extra.getBoolean("personal");
-
-
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+        setupData();
 
     }
 
+    private void setupData(){
+
+        Bundle extra = getActivity().getIntent().getExtras().getBundle("extra");
+        if (extra != null) {
+            current_account = extra.getParcelable("account");
+            current_house = extra.getParcelable("house");
+            personal = extra.getBoolean("personal");
+        }
+    }
 
 
     @Override
     public void onStart() {
         super.onStart();
         EventBus.getDefault().register(this);
-        populateItems();
     }
 
     @Override
@@ -177,8 +149,8 @@ public class FinanceFragment extends Fragment {
 
         if (isOp) {
             MaterialDialog dialog = new MaterialDialog.Builder(this.getContext())
-                    .title("Archive?")
-                    .content("Would you like to Archive this cost?")
+                    .title(R.string.archive)
+                    .content(R.string.wouldYouLikeToArchiveThisCost)
                     .positiveText(R.string.confirm)
                     .negativeText(R.string.cancel)
                     .onPositive(new MaterialDialog.SingleButtonCallback() {
@@ -189,11 +161,6 @@ public class FinanceFragment extends Fragment {
                             toMove.remove(location);
                             ArrayList<Cost> archive = current_house.getArchivedCosts();
                             archive.add(item);
-
-
-                            for (int i = 0; i < toMove.size(); i++) {
-                                Log.d("Costs", toMove.get(i).getCategory().getName());
-                            }
 
 
                             current_house.setCosts(toMove);
@@ -234,8 +201,8 @@ public class FinanceFragment extends Fragment {
         }
 
         final ProgressDialog progress = new ProgressDialog(this.getContext());
-        progress.setTitle("Updating");
-        progress.setMessage("Updating House...");
+        progress.setTitle(R.string.updating);
+        progress.setMessage(getString(R.string.updatingHouse));
         progress.show();
 
         new AsyncTask<Void, Void, Void>() {
@@ -254,7 +221,7 @@ public class FinanceFragment extends Fragment {
                                     .content("Cost Archived Successfully")
                                     .positiveText(R.string.confirm).show();
 
-                            populateItems();
+                            populateItems(item);
                         }
                     });
                 } catch (Exception exception) {
@@ -293,7 +260,7 @@ public class FinanceFragment extends Fragment {
                     getActivity().runOnUiThread(new Runnable() {
                         public void run() {
 
-                            populateItems();
+                            populateItems(item);
                             Log.d("Expired", "Item Expired");
                         }
                     });
@@ -410,7 +377,6 @@ public class FinanceFragment extends Fragment {
         };
     }
         View rootView = inflater.inflate(R.layout.fragment_finance, container, false);
-
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.rv);
 
 
@@ -433,7 +399,7 @@ public class FinanceFragment extends Fragment {
             mRecyclerView.setPadding(0, 150, 0, 0);
         }
 
-        mLayoutManager = new LinearLayoutManager(getActivity());
+            RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         adapter = new RVAdapter(current_house, current_account, personal, itemTouch);
@@ -593,7 +559,35 @@ public class FinanceFragment extends Fragment {
 
 
 
+
+
+    private void populateItems(House house){
+
+        EventBus.getDefault().post(new RequestDetailsEvent('f'));
+
+
+        if (house.getCost().size() == 0) {
+
+            mRecyclerView.setVisibility(View.GONE);
+            CardView empty = (CardView) getView().findViewById(R.id.finance_empty);
+            empty.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    EventBus.getDefault().post(new RequestDetailsEvent('h'));
+                }
+            });
+            empty.setVisibility(View.VISIBLE);
+
+        }else {
+            adapter = new RVAdapter(house, current_account, personal, itemTouch);
+            mRecyclerView.setAdapter(adapter);
+        }
+    }
+
+
     private void populateItems(){
+
+        EventBus.getDefault().post(new RequestDetailsEvent('f'));
 
         if (current_house.getCost().size() == 0) {
 

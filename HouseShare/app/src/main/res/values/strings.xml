@@ -98,4 +98,16 @@ Mauris nulla mauris, sollicitudin eu cursus ut, mollis id ex. Fusce consequat eg
     <string name="createNewCost">Create New Cost</string>
     <string name="createNewTask">Create New Task</string>
     <string name="please_add_a_cost_to_get_started">Please Add A Cost To Get Started.</string>
+    <string name="wouldYouLikeToArchiveThisCost">Would You Like To Archive This Cost?</string>
+    <string name="archive">Archive?</string>
+    <string name="pleaseAddATaskToGetStarted">Please Add A Task To Get Started</string>
+    <string name="category">Category</string>
+    <string name="owner">Owner</string>
+    <string name="done">Done</string>
+    <string name="notDone">Not Done</string>
+    <string name="task_description">Task Description</string>
+    <string name="confirmTask">Confirm Task</string>
+    <string name="markAsDone">Mark As Done</string>
+    <string name="taskNotes">Task Notes</string>
+    <string name="task_notes">Task Notes</string>
 </resources>

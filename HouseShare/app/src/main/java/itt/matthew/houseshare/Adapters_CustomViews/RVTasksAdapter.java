@@ -177,7 +177,7 @@ public class RVTasksAdapter extends RecyclerView.Adapter<RVTasksAdapter.PersonVi
             personViewHolder.TaskCategory.setTextColor(tasks.get(i).getArea().getColor());
             personViewHolder.TaskDate.setText(formatter.format(tasks.get(i).getStartDate().getTime()) + " to " + formatter.format(tasks.get(i).getEndDate().getTime()));
             personViewHolder.TaskInterval.setText("Next Due Date: " + formatter.format(getNextDate(tasks.get(i)).getTime()));
-            personViewHolder.TaskAmount.setVisibility(View.GONE);
+            personViewHolder.TaskAmount.setText(tasks.get(i).getArea().getDescription());
             personViewHolder.TaskColor.setBackgroundColor(tasks.get(i).getArea().getColor());
 
 
@@ -193,7 +193,7 @@ public class RVTasksAdapter extends RecyclerView.Adapter<RVTasksAdapter.PersonVi
             personViewHolder.TaskCategory.setTextColor(personalTask.get(i).getArea().getColor());
             personViewHolder.TaskDate.setText(formatter.format(personalTask.get(i).getStartDate().getTime()) + " to " + formatter.format(personalTask.get(i).getEndDate().getTime()));
             personViewHolder.TaskInterval.setText("Next Due Date: " + formatter.format(getNextDate(personalTask.get(i)).getTime()));
-            personViewHolder.TaskAmount.setVisibility(View.GONE);
+            personViewHolder.TaskAmount.setText(tasks.get(i).getArea().getDescription());
             personViewHolder.TaskColor.setBackgroundColor(personalTask.get(i).getArea().getColor());
 
             personViewHolder.bind(personViewHolder.cv, i, touchListener);

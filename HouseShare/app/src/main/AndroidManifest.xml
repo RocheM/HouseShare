@@ -67,10 +67,12 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".Activities.HouseSettingsActivity"
-            android:theme="@style/AppTheme.NoActionBar"/>
-
-        <activity android:name=".Activities.NewTask"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".Activities.NewTask"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".Activities.TaskDetails"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

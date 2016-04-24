@@ -1,10 +1,10 @@
 package itt.matthew.houseshare.Activities;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.widget.TextViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -13,37 +13,40 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
 
+import org.greenrobot.eventbus.Subscribe;
+
+import java.text.DateFormat;
+import java.text.NumberFormat;
+import java.util.Locale;
+
 import itt.matthew.houseshare.Events.OverviewEvent;
 import itt.matthew.houseshare.Fragments.CostOverviewFragment;
 import itt.matthew.houseshare.Fragments.PersonalCostOverview;
+import itt.matthew.houseshare.Fragments.TaskOverviewFragment;
 import itt.matthew.houseshare.Models.Account;
 import itt.matthew.houseshare.Models.Cost;
 import itt.matthew.houseshare.Models.CostSplit;
 import itt.matthew.houseshare.Models.House;
+import itt.matthew.houseshare.Models.Task;
 import itt.matthew.houseshare.R;
 
-import org.greenrobot.eventbus.Subscribe;
-import org.w3c.dom.Text;
+public class TaskDetails extends AppCompatActivity {
 
-import java.text.NumberFormat;
-import java.util.Locale;
-
-public class CostDetails extends AppCompatActivity {
 
     private House house;
     private Account current;
-    private Cost cost;
+    private Task task;
     private CostSplit curr;
     private int selectedUser = -1;
     private Toolbar toolbar;
-
 
     private FragmentManager fragmentManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_cost_details);
+        setContentView(R.layout.activity_task_details);
+
 
         setupData();
         setupUI();
@@ -51,7 +54,6 @@ public class CostDetails extends AppCompatActivity {
         fragmentManager = getSupportFragmentManager();
 
         loadSelection(0);
-
     }
 
 
@@ -63,6 +65,7 @@ public class CostDetails extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
 
     @Override
     protected void onStart() {
@@ -87,31 +90,20 @@ public class CostDetails extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        super.onBackPressed();
 
-        int count = getSupportFragmentManager().getBackStackEntryCount();
-
-
-        if (count == 1) {
-            finish();
-        } else if (count == 2){
-            toolbar.setTitle("Cost Overview");
-            getSupportFragmentManager().popBackStackImmediate();
-        }
-        else {
-            getSupportFragmentManager().popBackStackImmediate();
-        }
+        startMainActivity(current);
     }
-
 
     private void setupUI(){
 
 
-        AppBarLayout appbar = (AppBarLayout) findViewById(R.id.details_appbar);
+        AppBarLayout appbar = (AppBarLayout) findViewById(R.id.task_details_appbar);
         assert appbar != null;
-        appbar.setBackgroundColor(cost.getCategory().getColor());
+        appbar.setBackgroundColor(task.getArea().getColor());
 
 
-        toolbar = (Toolbar) findViewById(R.id.details_toolbar);
+        toolbar = (Toolbar) findViewById(R.id.task_details_toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_keyboard_backspace_24dp);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -121,30 +113,33 @@ public class CostDetails extends AppCompatActivity {
 
         toolbar.setTitle(current.getName());
 
-        TextView billName = (TextView) findViewById(R.id.detailsBillName);
-        TextView billAmount = (TextView) findViewById(R.id.detailsBillAmount);
-        TextView billPayers = (TextView) findViewById(R.id.detailsBillPayers);
 
-        if (billName != null) {
-            billName.setText("Category: " + cost.getCategory().getName());
+        TextView taskName = (TextView) findViewById(R.id.detailsTaskName);
+        TextView taskDates = (TextView) findViewById(R.id.detailsTaskDates);
+        TextView taskMembers = (TextView) findViewById(R.id.detailsTaskMembers);
+
+        if (taskName != null) {
+            taskName.setText("Area: " + task.getArea().getName());
         }
-        if (billAmount != null) {
-            NumberFormat format = NumberFormat.getCurrencyInstance(Locale.GERMANY);
-            billAmount.setText("Total Amount: " + format.format(cost.getAmount()));
+        if (taskDates != null) {
+
+            DateFormat formatter = DateFormat.getDateInstance(DateFormat.SHORT);
+            taskDates.setText("From " + formatter.format(task.getStartDate().getTime()) + " To " + formatter.format(task.getEndDate().getTime()));
         }
-        if (billPayers != null) {
-            if(cost.getSplit().size() == 1){
-                billPayers.setText("Owned By One Person");
+        if (taskMembers != null) {
+            if(task.getInterval() == 1){
+                taskMembers.setText("Occurs Every Day");
             }else
-                billPayers.setText("Split Between " + Integer.toString(cost.getSplit().size()) + " People");
+                taskMembers.setText("Occurs Every " + task.getInterval() + " Days");
         }
+
 
         Window window = this.getWindow();
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        window.setStatusBarColor(darker(cost.getCategory().getColor()));
+        window.setStatusBarColor(darker(task.getArea().getColor()));
 
-        toolbar.setBackgroundColor(cost.getCategory().getColor());
+        toolbar.setBackgroundColor(task.getArea().getColor());
 
     }
 
@@ -163,9 +158,21 @@ public class CostDetails extends AppCompatActivity {
 
         Bundle b = getIntent().getBundleExtra("extra");
         house = b.getParcelable("house");
-        int costLocation = b.getInt("cost");
+        int taskLocation = b.getInt("task");
         current = b.getParcelable("account");
-        cost = house.getCost().get(costLocation);
+        task = house.getTask().get(taskLocation);
+
+    }
+
+
+    public void startMainActivity(Account acc) {
+
+        Intent i = new Intent(this, MainActivity.class);
+        Bundle b = new Bundle();
+        b.putParcelable("Account", acc);
+        i.putExtra("Bundle", b);
+        startActivity(i);
+        finish();
 
     }
 
@@ -173,32 +180,33 @@ public class CostDetails extends AppCompatActivity {
     private void loadSelection(int i){
         switch (i) {
             case 0:
-                CostOverviewFragment overviewFragment = new CostOverviewFragment();
-                toolbar.setTitle("Cost Overview");
+                TaskOverviewFragment overviewFragment = new TaskOverviewFragment();
+                toolbar.setTitle("Task Overview");
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                 Bundle bundle = new Bundle();
                 bundle.putParcelable("house", house);
                 bundle.putParcelable("account", current);
-                bundle.putInt("cost", getIntent().getBundleExtra("extra").getInt("cost"));
+                bundle.putInt("task", getIntent().getBundleExtra("extra").getInt("task"));
                 getIntent().putExtra("extra", bundle);
-                fragmentTransaction.replace(R.id.detailsFragmentHolder, overviewFragment);
+                fragmentTransaction.replace(R.id.taskDetailsFragmentHolder, overviewFragment);
                 fragmentTransaction.addToBackStack(overviewFragment.getTag());
                 fragmentTransaction.commit();
                 break;
             case 1:
-                PersonalCostOverview personalCostOverview = new PersonalCostOverview();
-                toolbar.setTitle(cost.getSplit().get(selectedUser).getName()+"'s payments");
-                fragmentTransaction = fragmentManager.beginTransaction();
-                bundle = new Bundle();
-                bundle.putParcelable("house", house);
-                bundle.putParcelable("account", current);
-                bundle.putInt("cost", getIntent().getBundleExtra("extra").getInt("cost"));
-                bundle.putInt("selected", selectedUser);
-                getIntent().putExtra("extra", bundle);
-                fragmentTransaction.replace(R.id.detailsFragmentHolder, personalCostOverview);
-                fragmentTransaction.addToBackStack(personalCostOverview.getTag());
-                fragmentTransaction.commit();
+//                PersonalCostOverview personalCostOverview = new PersonalCostOverview();
+//                toolbar.setTitle(cost.getSplit().get(selectedUser).getName()+"'s payments");
+//                fragmentTransaction = fragmentManager.beginTransaction();
+//                bundle = new Bundle();
+//                bundle.putParcelable("house", house);
+//                bundle.putParcelable("account", current);
+//                bundle.putInt("cost", getIntent().getBundleExtra("extra").getInt("cost"));
+//                bundle.putInt("selected", selectedUser);
+//                getIntent().putExtra("extra", bundle);
+//                fragmentTransaction.replace(R.id.detailsFragmentHolder, personalCostOverview);
+//                fragmentTransaction.addToBackStack(personalCostOverview.getTag());
+//                fragmentTransaction.commit();
                 break;
         }
     }
+
 }

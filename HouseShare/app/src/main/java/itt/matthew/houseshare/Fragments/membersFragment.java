@@ -26,14 +26,11 @@ import itt.matthew.houseshare.Models.House;
 import itt.matthew.houseshare.R;
 
 public class membersFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
 
 
     private Account current;
     private House house;
+    private Boolean reorder;
     private membersFragment.OnItemTouchListener itemTouchListener;
     private ArrayList<Integer> moderators;
 
@@ -44,8 +41,6 @@ public class membersFragment extends Fragment {
     public static membersFragment newInstance(String param1, String param2) {
         membersFragment fragment = new membersFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
@@ -142,7 +137,8 @@ public class membersFragment extends Fragment {
         Bundle b = getActivity().getIntent().getBundleExtra("extra");
         house = b.getParcelable("house");
         current = b.getParcelable("account");
-        
+        reorder = b.getBoolean("reorder");
+
     }
 
     // TODO: Rename method, update argument and hook method into UI event

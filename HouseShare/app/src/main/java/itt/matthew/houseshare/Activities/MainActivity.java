@@ -165,7 +165,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             startTaskActivity(bundle);
         }
         else if (event.getRequestFlag() == 'f')
-            org.greenrobot.eventbus.EventBus.getDefault().post(new ReplyEvent(house, current));
+            org.greenrobot.eventbus.EventBus.getDefault().post(new UpdateAccountEvent(current, house));
 
     }
 

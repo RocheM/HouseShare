@@ -60,17 +60,8 @@ public class Task {
             cal.setTime(temp);
             cal.add(Calendar.DATE, interval); // add interval days
 
-            ArrayList<Pair<String, Boolean>> instances;
-            instances = new ArrayList<>();
-
-            for (int i = 0; i < users.size(); i++){
-
-                Pair<String, Boolean>  instance = new Pair<>(users.get(i), false);
-
-                instances.add(instance);
-            }
-
-
+            String account = users.get(count % users.size());
+            count++;
 
 
             count ++;
@@ -78,7 +69,7 @@ public class Task {
                 cont = true;
             }
             else
-                taskInstances.add(new TaskInstance(cal, instances));
+                taskInstances.add(new TaskInstance(cal, account, false));
 
 
 

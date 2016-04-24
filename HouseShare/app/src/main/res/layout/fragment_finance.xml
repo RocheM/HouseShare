@@ -21,22 +21,22 @@
         android:foreground="?android:attr/selectableItemBackground"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="gone">
+                android:visibility="gone">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
-            <TextView
-                android:layout_width="200dp"
-                android:layout_height="wrap_content"
-                android:text="@string/please_add_a_cost_to_get_started"
-                android:textColor="@color/colorPrimary"
-                android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
-                android:layout_centerInParent="true"
-                android:layout_margin="20dp"
-                android:textStyle="bold"
-                android:textAlignment="center" />
+                    <TextView
+                        android:layout_width="200dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/please_add_a_cost_to_get_started"
+                        android:textColor="@color/colorPrimary"
+                        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
+                        android:layout_centerInParent="true"
+                        android:layout_margin="20dp"
+                        android:textStyle="bold"
+                        android:textAlignment="center" />
 
     </RelativeLayout>
 

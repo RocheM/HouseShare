@@ -12,7 +12,7 @@ import java.util.Calendar;
 public class CostInstance {
 
     private Calendar date;
-
+    private Calendar paidOn;
     public ArrayList<Pair<String, Boolean>> paidList(){
         return paid;
     }
@@ -39,12 +39,25 @@ public class CostInstance {
         this.date = date;
     }
 
+
+    public Calendar getPaidOn() {
+        return paidOn;
+    }
+
+    public void setPaidOn(Calendar paidOn) {
+        this.paidOn = paidOn;
+    }
+
     public ArrayList<Pair<String, Boolean>> paid;
+
+
 
     public CostInstance(Calendar date, ArrayList<Pair<String, Boolean>> paid){
         this.date = date;
         this.paid = paid;
     }
+
+
 
 
 

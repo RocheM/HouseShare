@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -57,6 +58,8 @@ import java.util.GregorianCalendar;
 import de.hdodenhof.circleimageview.CircleImageView;
 import itt.matthew.houseshare.Events.CostEvent;
 import itt.matthew.houseshare.Events.MyHandler;
+import itt.matthew.houseshare.Events.RequestDetailsEvent;
+import itt.matthew.houseshare.Events.RequestTaskEvent;
 import itt.matthew.houseshare.Fragments.CostSplitFragment;
 import itt.matthew.houseshare.Fragments.CreateCostFragment;
 import itt.matthew.houseshare.Fragments.TasksFragment;
@@ -409,8 +412,7 @@ public class NewCost extends AppCompatActivity implements ColorChooserDialog.Col
                     mHouseTable.update(item).get();
                     runOnUiThread(new Runnable() {
                         public void run() {
-                           finish();
-
+                            startMainActivity(current);
                         }
                     });
                 } catch (Exception exception) {
@@ -421,6 +423,18 @@ public class NewCost extends AppCompatActivity implements ColorChooserDialog.Col
             }
         }.execute();
     }
+
+    public void startMainActivity(Account acc) {
+
+        Intent i = new Intent(this, MainActivity.class);
+        Bundle b = new Bundle();
+        b.putParcelable("Account", acc);
+        i.putExtra("Bundle", b);
+        startActivity(i);
+        finish();
+
+    }
+
 
     @Override
     public void onStart() {
@@ -450,7 +464,6 @@ public class NewCost extends AppCompatActivity implements ColorChooserDialog.Col
         public Fragment getItem(int i) {
             switch(i) {
                 case 0:return CreateCostFragment.newInstance("Test", "Test");
-
                 case 1: return CostSplitFragment.newInstance("Test", "Test");
             }
             return null;
@@ -470,7 +483,6 @@ public class NewCost extends AppCompatActivity implements ColorChooserDialog.Col
     private void CreateNewCost(){
 
         ArrayList<CostSplit> costSplits = new ArrayList<>();
-
         DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 
         String Content = newCost.getCategory().getName() + "\n" + newCost.getAmount() + "\nInterval:\t" + newCost.getInterval() + "\nDates: " + formatter.format(newCost.getStartDate().getTime()) + " to " + formatter.format(newCost.getEndDate().getTime());
