@@ -73,6 +73,9 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".Activities.TaskDetails"
             android:theme="@style/AppTheme.NoActionBar"></activity>
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="89572a739a5aefe204cefaf9a6a44b55d44dcc19" />
     </application>
 
 </manifest>

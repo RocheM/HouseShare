@@ -134,10 +134,10 @@ public class TaskOverviewFragment extends Fragment {
 
         Bundle extras = this.getActivity().getIntent().getBundleExtra("extra");
         house = extras.getParcelable("house");
-        int costLocation = extras.getInt("cost");
+        int taskloc = extras.getInt("task");
         current = extras.getParcelable("account");
-        task = house.getTask().get(costLocation);
-        taskLocation = costLocation;
+        task = house.getTask().get(taskloc);
+        taskLocation = taskloc;
 
     }
 
@@ -146,6 +146,7 @@ public class TaskOverviewFragment extends Fragment {
         itemTouchListener = new OnItemTouchListener() {
             @Override
             public void onCardViewTouch(View view, int position) {
+
 
                 selectedTask = position;
                 Boolean isSelected = false;
@@ -207,15 +208,13 @@ public class TaskOverviewFragment extends Fragment {
                     taskDescription = (TextView) v.findViewById(R.id.task_dialog_description);
                     taskDescription.setText(task.getArea().getDescription());
 
-                    if (!isSelected) {
-                        materialDialog.getBuilder().positiveText("Okay");
-                        materialDialog.getBuilder().negativeText(null);
-                        materialDialog.getBuilder().onPositive(new MaterialDialog.SingleButtonCallback() {
-                            @Override
-                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                dialog.dismiss();
-                            }
-                        });
+                    if (!isSelected && !isPaid) {
+                        materialDialog =  new MaterialDialog.Builder(view.getContext())
+                                .title(R.string.confirmTask)
+                                .content(R.string.theOwnerHasNotCompletedThisTaskYet)
+                                .positiveText(R.string.markAsDone)
+                                .build();
+
                     }
 
                     materialDialog.show();

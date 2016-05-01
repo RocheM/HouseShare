@@ -514,49 +514,70 @@ public class NewTask extends AppCompatActivity implements ColorChooserDialog.Col
     }
 
 
-    private void CreateNewTask(){
+    private void CreateNewTask() {
 
         EventBus.getDefault().post(new RequestTaskEvent(1));
 
+        if (newTask.getUsers().size() == 0) {
 
+            new MaterialDialog.Builder(this)
+                    .title(R.string.error)
+                    .content(R.string.youMustHaveAtLeastOneMemberAssignedToThisTask)
+                    .positiveText(R.string.mdtp_ok)
+                    .show();
+        }else if (newTask.getStartDate() == null){
 
+            new MaterialDialog.Builder(this)
+                    .title(R.string.error)
+                    .content(R.string.mustSetAStartDate)
+                    .positiveText(R.string.mdtp_ok)
+                    .show();
+        }else if (newTask.getEndDate() == null){
 
-        DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-
-        String Content = "Area: " + newTask.getArea().getName() + "\nDescription:\n" + newTask.getArea().getDescription() + "\nInterval: " + Integer.toString(newTask.getInterval()) + "Day(s)\nDate Range:\n" + formatter.format(newTask.getStartDate().getTime()) + " to " + formatter.format(newTask.getEndDate().getTime());
-        for (int i = 0; i < newTask.getUsers().size(); i++) {
-            for (int j = 0; j < house.getMembers().size(); j++){
-                if (newTask.getUsers().get(i). equals(house.getMembers().get(j).getFacebookID()))
-                    Content = Content.concat("\n" + house.getMembers().get(j).getName() + " Takes Shift #" + Integer.toString(i + 1));
-            }
+            new MaterialDialog.Builder(this)
+                    .title(R.string.error)
+                    .content(R.string.mustSetAnEndDate)
+                    .positiveText(R.string.mdtp_ok)
+                    .show();
         }
+        else {
+
+            DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+
+            String Content = "Area: " + newTask.getArea().getName() + "\nDescription:\n" + newTask.getArea().getDescription() + "\nInterval: " + Integer.toString(newTask.getInterval()) + "Day(s)\nDate Range:\n" + formatter.format(newTask.getStartDate().getTime()) + " to " + formatter.format(newTask.getEndDate().getTime());
+            for (int i = 0; i < newTask.getUsers().size(); i++) {
+                for (int j = 0; j < house.getMembers().size(); j++) {
+                    if (newTask.getUsers().get(i).equals(house.getMembers().get(j).getFacebookID()))
+                        Content = Content.concat("\n" + house.getMembers().get(j).getName() + " Takes Shift #" + Integer.toString(i + 1));
+                }
+            }
 
 
-        new MaterialDialog.Builder(this)
-                .title(R.string.confirm)
-                .content(Content)
-                .positiveText(R.string.confirm)
-                .onPositive(new MaterialDialog.SingleButtonCallback() {
-                    @Override
-                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+            new MaterialDialog.Builder(this)
+                    .title(R.string.confirm)
+                    .content(Content)
+                    .positiveText(R.string.confirm)
+                    .onPositive(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
 
-                        ArrayList<Task> tasks = house.getTask();
-                        newTask.initalizeIntervals();
-                        tasks.add(newTask);
-                        house.setTasks(tasks);
-                        updateItem(house);
-                    }
-                })
-                .negativeText(R.string.cancel)
-                .onNegative(new MaterialDialog.SingleButtonCallback() {
-                    @Override
-                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        dialog.dismiss();
-                    }
-                })
-                .show();
+                            ArrayList<Task> tasks = house.getTask();
+                            newTask.initalizeIntervals();
+                            tasks.add(newTask);
+                            house.setTasks(tasks);
+                            updateItem(house);
+                        }
+                    })
+                    .negativeText(R.string.cancel)
+                    .onNegative(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                            dialog.dismiss();
+                        }
+                    })
+                    .show();
+        }
     }
-
 
 
 

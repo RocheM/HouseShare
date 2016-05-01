@@ -110,4 +110,9 @@ Mauris nulla mauris, sollicitudin eu cursus ut, mollis id ex. Fusce consequat eg
     <string name="markAsDone">Mark As Done</string>
     <string name="taskNotes">Task Notes</string>
     <string name="task_notes">Task Notes</string>
+    <string name="youMustHaveAtLeastOneMemberAssignedToThisTask">You must have at least one person Assigned to this Task.</string>
+    <string name="error">Error</string>
+    <string name="mustSetAStartDate">Must Set a Start Date</string>
+    <string name="mustSetAnEndDate">Must Set an End Date</string>
+    <string name="theOwnerHasNotCompletedThisTaskYet">The Owner has not completed this Task yet</string>
 </resources>

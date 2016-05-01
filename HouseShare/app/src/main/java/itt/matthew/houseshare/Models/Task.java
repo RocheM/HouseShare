@@ -63,8 +63,6 @@ public class Task {
             String account = users.get(count % users.size());
             count++;
 
-
-            count ++;
             if(cal.after(EndDate)) {
                 cont = true;
             }

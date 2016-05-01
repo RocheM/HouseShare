@@ -46,7 +46,7 @@ public class memberReorderFragment extends Fragment implements MembersReorderAda
     private GestureManager mGestureManager;
     private MembersReorderAdapter adapter;
     private ItemTouchHelper mItemTouchHelper;
-    RecyclerView rv;
+    private RecyclerView rv;
 
 
     // TODO: Rename and chan types and number of parameters
@@ -84,6 +84,10 @@ public class memberReorderFragment extends Fragment implements MembersReorderAda
         ArrayList<Account> accountArrayList = adapter.getMembers();
         accountArrayList.add(addToListEvent.getToAdd());
         adapter = new MembersReorderAdapter(accountArrayList, getContext(), this);
+        ItemTouchHelper.Callback callback =
+                new SimpleItemTouchHelperCallback(adapter);
+        mItemTouchHelper = new ItemTouchHelper(callback);
+        mItemTouchHelper.attachToRecyclerView(rv);
         rv.setAdapter(adapter);
 
     }
@@ -127,7 +131,8 @@ public class memberReorderFragment extends Fragment implements MembersReorderAda
     private void setupUI() {
 
         members = new ArrayList<>();
-        members.add(current);
+//        members.add(current);
+        members = house.getMembers();
 
         rv = (RecyclerView) getView().findViewById(R.id.member_reorder_rv);
 
